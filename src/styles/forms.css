@@ -1,0 +1,127 @@
+/* ==========================================================================
+   Формы: вход, регистрация, профиль. Цвета — только через tokens.css.
+   ========================================================================== */
+
+.app-loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-2);
+}
+
+.auth-screen {
+  justify-content: center;
+  gap: 20px;
+  padding-top: calc(env(safe-area-inset-top) + 32px);
+}
+
+.form { display: flex; flex-direction: column; gap: 14px; }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+
+.field-age { max-width: 84px; }
+
+.field label { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+
+.field input,
+.field select {
+  font: inherit;
+  padding: 11px 12px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.field input:disabled { color: var(--ink-3); background: var(--surface-2); }
+
+.field input:focus,
+.field select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.field-hint { font-size: 12px; color: var(--ink-3); }
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.checkbox-row input { width: 18px; height: 18px; accent-color: var(--accent); }
+
+.checkbox-group { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.checkbox-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--line-strong);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.checkbox-chip:has(input:checked) {
+  border-color: var(--accent);
+  background: var(--ok-bg);
+  color: var(--accent);
+}
+
+.checkbox-chip input { position: absolute; opacity: 0; width: 0; height: 0; }
+
+.btn {
+  font: inherit;
+  font-weight: 600;
+  padding: 12px 16px;
+  border-radius: var(--r-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-align: center;
+}
+
+.btn-primary { background: var(--accent); color: var(--on-accent); }
+.btn-primary:active { background: var(--accent-deep); }
+.btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.btn-ghost { background: none; border-color: var(--line-strong); color: var(--ink); }
+
+.form-error {
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  background: var(--warn-bg);
+  color: var(--warn);
+  font-size: 13px;
+  border: 1px solid currentColor;
+}
+
+.auth-switch { text-align: center; font-size: 13px; color: var(--ink-2); }
+
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+  margin-top: 6px;
+}
+
+.child-row { display: flex; align-items: flex-end; gap: 8px; }
+.child-row .field:first-child { flex: 1; }
+
+.child-remove {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--warn);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
