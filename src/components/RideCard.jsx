@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import Icon from './Icon.jsx';
 import QueueTag from './QueueTag.jsx';
 import SeatMeter from './SeatMeter.jsx';
@@ -47,16 +48,13 @@ export default function RideCard({ offer, isOwn }) {
 
       <div className="actions">
         {isOwn ? (
-          <p className="own-note">Это ваша поездка</p>
+          <Link className="btn btn-primary" to={`/board/drivers/${offer.id}/responses`}>
+            Отклики
+          </Link>
         ) : (
-          <button
-            className="btn btn-primary"
-            type="button"
-            disabled
-            title="Отклики появятся в одной из следующих сессий"
-          >
+          <Link className="btn btn-primary" to={`/board/drivers/${offer.id}/respond`}>
             Откликнуться
-          </button>
+          </Link>
         )}
         {offer.driverPhone && (
           <a

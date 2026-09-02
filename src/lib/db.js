@@ -7,6 +7,7 @@ import {
   doc,
   onSnapshot,
   query,
+  runTransaction,
   serverTimestamp,
   setDoc,
   updateDoc,
@@ -48,6 +49,13 @@ export function subscribeRideOffers(dateKey, callback) {
       .map((item) => ({ id: item.id, ...item.data() }))
       .sort((a, b) => a.arrivalTime.localeCompare(b.arrivalTime));
     callback(offers);
+  });
+}
+
+/** Подписка на одно предложение (для экранов отклика и списка откликов). */
+export function subscribeRideOffer(offerId, callback) {
+  return onSnapshot(doc(db, 'rideOffers', offerId), (snap) => {
+    callback(snap.exists() ? { id: snap.id, ...snap.data() } : null);
   });
 }
 
@@ -111,4 +119,80 @@ export function createRequest(uid, profile, { date, arrivalTime, childrenIds, no
   };
   if (note) payload.note = note;
   return addDoc(collection(db, 'requests'), payload);
+}
+
+/**
+ * Отклик заказчика на предложение водителя (S6). `offerDriverId` —
+ * денормализованный владелец предложения, нужен правилам Firestore, чтобы
+ * водитель мог читать и подтверждать отклики на свои поездки. Данные
+ * заказчика и выбранные дети — снимком, как и в других коллекциях.
+ */
+export function createResponse(uid, profile, offer, { childrenIds, note }) {
+  const children = profile.children.filter((child) => childrenIds.includes(child.id));
+  const payload = {
+    offerId: offer.id,
+    offerDriverId: offer.driverId,
+    customerId: uid,
+    customerName: profile.name,
+    customerPhone: profile.phone,
+    address: profile.address,
+    homeQueue: profile.homeQueue,
+    children,
+    date: offer.date,
+    arrivalTime: offer.arrivalTime,
+    status: 'pending',
+    createdAt: serverTimestamp(),
+  };
+  if (note) payload.note = note;
+  return addDoc(collection(db, 'responses'), payload);
+}
+
+/**
+ * Подписка на отклики к конкретному предложению — экран водителя
+ * «Отклики». Сортировка по времени создания на клиенте (без индекса).
+ */
+export function subscribeOfferResponses(offerId, callback) {
+  const responsesQuery = query(collection(db, 'responses'), where('offerId', '==', offerId));
+  return onSnapshot(responsesQuery, (snap) => {
+    const responses = snap.docs
+      .map((item) => ({ id: item.id, ...item.data() }))
+      .sort((a, b) => (a.createdAt?.toMillis?.() ?? 0) - (b.createdAt?.toMillis?.() ?? 0));
+    callback(responses);
+  });
+}
+
+/**
+ * Подтверждение отклика водителем. Уменьшает свободные места у предложения
+ * на количество детей в отклике; при достижении нуля предложение
+ * закрывается и уходит с доски. Только `runTransaction` — иначе два
+ * одновременных подтверждения могут увести места в минус.
+ */
+export async function confirmResponse(response) {
+  const offerRef = doc(db, 'rideOffers', response.offerId);
+  const responseRef = doc(db, 'responses', response.id);
+
+  await runTransaction(db, async (tx) => {
+    const [offerSnap, responseSnap] = await Promise.all([tx.get(offerRef), tx.get(responseRef)]);
+    if (!offerSnap.exists() || !responseSnap.exists()) {
+      throw new Error('not-found');
+    }
+    const offerData = offerSnap.data();
+    const responseData = responseSnap.data();
+    if (responseData.status !== 'pending') {
+      throw new Error('already-handled');
+    }
+    const count = responseData.children.length;
+    if (offerData.seatsFree < count) {
+      throw new Error('not-enough-seats');
+    }
+
+    const seatsFree = offerData.seatsFree - count;
+    tx.update(offerRef, seatsFree === 0 ? { seatsFree, status: 'closed' } : { seatsFree });
+    tx.update(responseRef, { status: 'confirmed' });
+  });
+}
+
+/** Отклонение отклика водителем — без изменения мест, транзакция не нужна. */
+export function rejectResponse(responseId) {
+  return updateDoc(doc(db, 'responses', responseId), { status: 'rejected' });
 }
