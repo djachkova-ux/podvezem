@@ -1,0 +1,675 @@
+<title>Подвезём</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Oswald:wght@400;500;600&display=swap">
+<style>
+  /* ============ ПАЛИТРА «ХВОЯ» — светлая тема ============ */
+  :root {
+    --paper: #ECF0EB;
+    --surface: #FFFFFF;
+    --surface-2: #F4F7F3;
+    --ink: #16241C;
+    --ink-2: #566259;
+    --ink-3: #8B9A8E;
+    --line: #DBE3D9;
+    --line-strong: #C3CEC0;
+    --rail: #C3CEC0;
+    --accent: #1F5140;
+    --accent-deep: #143A2C;
+    --on-accent: #F2F7F2;
+    --gold: #B8912A;
+    --ok: #2E7D5B;   --ok-bg: #E3F0E9;
+    --warn: #B4622B; --warn-bg: #F8EBE0;
+    --pend: #5A66A0; --pend-bg: #E8EAF5;
+    --q1: #35707F;   --q1-bg: #E4EFF1;
+    --q2: #97731D;   --q2-bg: #F5EEDD;
+    --q3: #7A5A9C;   --q3-bg: #EEE9F5;
+    --navbg: #10241B; --navink: #ECF0EB; --navink-2: #7C8E82;
+    --frame: #C8D2C7;
+    --grid: rgba(31, 81, 64, .10);
+    --shadow: 0 1px 2px rgba(22,36,28,.07), 0 10px 28px -14px rgba(22,36,28,.4);
+    --shadow-sm: 0 1px 2px rgba(22,36,28,.08);
+    --sans: "Golos Text", "Segoe UI", system-ui, sans-serif;
+    --mono-ish: "Oswald", "Golos Text", system-ui, sans-serif;
+  }
+
+  /* ============ ПАЛИТРА «ХВОЯ» — тёмная тема ============ */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #0F1713;
+      --surface: #17211B;
+      --surface-2: #1D2922;
+      --ink: #E9EFE7;
+      --ink-2: #A6B5A9;
+      --ink-3: #7B8A7E;
+      --line: #263329;
+      --line-strong: #344438;
+      --rail: #344438;
+      --accent: #4FA083;
+      --accent-deep: #3B8069;
+      --on-accent: #0F1713;
+      --gold: #DDB44F;
+      --ok: #74C29E;   --ok-bg: rgba(116,194,158,.14);
+      --warn: #E08C5C; --warn-bg: rgba(224,140,92,.15);
+      --pend: #9FA8E8; --pend-bg: rgba(159,168,232,.15);
+      --q1: #7FB9C6;   --q1-bg: rgba(127,185,198,.14);
+      --q2: #D8B45E;   --q2-bg: rgba(216,180,94,.14);
+      --q3: #A995DC;   --q3-bg: rgba(169,149,220,.14);
+      --navbg: #0A110D; --navink: #E9EFE7; --navink-2: #7B8A7E;
+      --frame: #263329;
+      --grid: rgba(233,239,231,.055);
+      --shadow: 0 1px 2px rgba(0,0,0,.45), 0 12px 32px -16px rgba(0,0,0,.8);
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0F1713;
+    --surface: #17211B;
+    --surface-2: #1D2922;
+    --ink: #E9EFE7;
+    --ink-2: #A6B5A9;
+    --ink-3: #7B8A7E;
+    --line: #263329;
+    --line-strong: #344438;
+    --rail: #344438;
+    --accent: #4FA083;
+    --accent-deep: #3B8069;
+    --on-accent: #0F1713;
+    --gold: #DDB44F;
+    --ok: #74C29E;   --ok-bg: rgba(116,194,158,.14);
+    --warn: #E08C5C; --warn-bg: rgba(224,140,92,.15);
+    --pend: #9FA8E8; --pend-bg: rgba(159,168,232,.15);
+    --q1: #7FB9C6;   --q1-bg: rgba(127,185,198,.14);
+    --q2: #D8B45E;   --q2-bg: rgba(216,180,94,.14);
+    --q3: #A995DC;   --q3-bg: rgba(169,149,220,.14);
+    --navbg: #0A110D; --navink: #E9EFE7; --navink-2: #7B8A7E;
+    --frame: #263329;
+    --grid: rgba(233,239,231,.055);
+    --shadow: 0 1px 2px rgba(0,0,0,.45), 0 12px 32px -16px rgba(0,0,0,.8);
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.5);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .i { width: 1em; height: 1em; display: block; flex: none; }
+
+  /* ---------- страница-презентация ---------- */
+  .page { max-width: 1180px; margin: 0 auto; padding: 32px 20px 64px; }
+  .pitch-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; flex-wrap: wrap; margin-bottom: 30px; }
+  .eyebrow {
+    font-family: var(--mono-ish); font-size: 12px; font-weight: 500;
+    letter-spacing: .16em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 8px;
+  }
+  .pitch-head h1 { font-size: 30px; line-height: 1.15; margin: 0 0 10px; letter-spacing: -.02em; text-wrap: balance; font-weight: 700; }
+  .lede { margin: 0; max-width: 56ch; color: var(--ink-2); }
+  .theme-btn {
+    display: inline-flex; align-items: center; gap: 8px; font: inherit; font-size: 13px; font-weight: 500;
+    color: var(--ink); background: var(--surface); border: 1px solid var(--line-strong);
+    border-radius: 999px; padding: 9px 15px; cursor: pointer; box-shadow: var(--shadow-sm);
+  }
+  .theme-btn:hover { border-color: var(--accent); }
+  .theme-btn:focus-visible, button:focus-visible, .tap:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .layout { display: grid; grid-template-columns: 390px minmax(0, 1fr); gap: 48px; align-items: start; }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; gap: 36px; justify-items: center; } }
+
+  /* ---------- телефон ---------- */
+  .phone-col { display: flex; flex-direction: column; gap: 14px; }
+  .phone {
+    width: 390px; max-width: 100%; height: 812px;
+    background: var(--surface); border: 10px solid var(--frame); border-radius: 42px;
+    box-shadow: var(--shadow); overflow: hidden; position: relative;
+    display: flex; flex-direction: column;
+  }
+  .status-bar {
+    height: 34px; flex: none; display: flex; align-items: center; justify-content: space-between;
+    padding: 0 22px; font-family: var(--mono-ish); font-size: 12px; color: var(--ink-2);
+    background: var(--surface);
+  }
+  .status-bar .dots { display: flex; gap: 4px; align-items: center; }
+  .status-bar .dots span { width: 5px; height: 5px; border-radius: 50%; background: var(--ink-3); }
+  .status-bar .dots span:last-child { width: 16px; height: 8px; border-radius: 2px; border: 1px solid var(--ink-3); background: none; }
+
+  .app-head {
+    flex: none; background: var(--surface); border-bottom: 1px solid var(--line);
+    background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 22px 22px, 22px 22px;
+  }
+  .brand-row { display: flex; align-items: center; gap: 10px; padding: 6px 18px 12px; }
+  .mark {
+    width: 32px; height: 32px; border-radius: 10px; background: var(--accent); color: var(--on-accent);
+    display: grid; place-items: center; font-size: 18px; box-shadow: 0 2px 0 var(--accent-deep);
+  }
+  .brand { font-weight: 700; font-size: 18px; letter-spacing: -.01em; }
+  .brand-date { font-family: var(--mono-ish); font-size: 12px; color: var(--ink-2); letter-spacing: .04em; text-transform: uppercase; }
+  .bell {
+    margin-left: auto; position: relative; width: 38px; height: 38px; border-radius: 12px;
+    border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink);
+    display: grid; place-items: center; font-size: 18px; cursor: pointer;
+  }
+  .bell::after {
+    content: ""; position: absolute; top: 7px; right: 8px; width: 8px; height: 8px;
+    border-radius: 50%; background: var(--warn); border: 2px solid var(--surface);
+  }
+
+  .segmented { display: flex; gap: 4px; margin: 0 18px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 14px; }
+  .segmented button {
+    flex: 1; font: inherit; font-size: 14px; font-weight: 600; color: var(--ink-2);
+    background: none; border: 0; border-radius: 10px; padding: 9px 0; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  }
+  .segmented button[aria-selected="true"] { background: var(--ink); color: var(--surface); box-shadow: var(--shadow-sm); }
+  .segmented .count { font-family: var(--mono-ish); font-size: 12px; opacity: .75; }
+
+  .dates { display: flex; gap: 8px; overflow-x: auto; padding: 14px 18px 4px; scrollbar-width: none; }
+  .dates::-webkit-scrollbar { display: none; }
+  .date {
+    flex: none; width: 50px; padding: 8px 0 9px; border-radius: 14px; text-align: center;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); cursor: pointer;
+  }
+  .date .dow { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+  .date .num { font-family: var(--mono-ish); font-size: 19px; font-weight: 500; color: var(--ink); line-height: 1.2; }
+  .date[aria-current="date"] { background: var(--accent); border-color: var(--accent-deep); color: var(--on-accent); }
+  .date[aria-current="date"] .num { color: var(--on-accent); }
+  .date.dim { opacity: .5; }
+
+  .filters { display: flex; gap: 7px; overflow-x: auto; padding: 12px 18px 14px; scrollbar-width: none; }
+  .filters::-webkit-scrollbar { display: none; }
+  .chip {
+    flex: none; font: inherit; font-size: 13px; font-weight: 500; padding: 7px 13px; cursor: pointer;
+    border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink-2);
+    display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  }
+  .chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+  .chip .sub { font-family: var(--mono-ish); font-size: 11px; opacity: .8; letter-spacing: .03em; }
+
+  .board { flex: 1; overflow-y: auto; padding: 0 18px 96px; background: var(--paper); }
+  .board-note {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+    padding: 16px 2px 10px; font-size: 13px; color: var(--ink-2);
+  }
+  .board-note strong { color: var(--ink); font-weight: 600; }
+  .board-note .link { color: var(--q1); font-weight: 500; white-space: nowrap; }
+
+  /* маршрутный рельс и карточки */
+  .route { position: relative; padding-left: 26px; }
+  .route::before {
+    content: ""; position: absolute; left: 7px; top: 10px; bottom: 26px;
+    border-left: 2px dashed var(--rail);
+  }
+  .ride { position: relative; margin-bottom: 14px; }
+  .ride::before {
+    content: ""; position: absolute; left: -25px; top: 20px; width: 16px; height: 16px;
+    border-radius: 50%; background: var(--surface); border: 3px solid var(--rail);
+  }
+  .ride.is-open::before { border-color: var(--gold); }
+  .ride.is-pending::before { border-color: var(--pend); }
+  .ride-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 18px;
+    padding: 14px 15px 13px; box-shadow: var(--shadow-sm);
+  }
+  .ride-top { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; }
+  .time { font-family: var(--mono-ish); font-size: 28px; font-weight: 500; line-height: 1; letter-spacing: .01em; font-variant-numeric: tabular-nums; }
+  .time-note { font-family: var(--sans); font-size: 12px; color: var(--ink-3); font-weight: 400; }
+  .shift {
+    margin-left: auto; font-family: var(--mono-ish); font-size: 11px; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--ink-2); border: 1px solid var(--line-strong); border-radius: 6px; padding: 3px 7px;
+  }
+  .who { display: flex; align-items: center; gap: 10px; margin-bottom: 11px; }
+  .avatar {
+    width: 38px; height: 38px; flex: none; border-radius: 12px; display: grid; place-items: center;
+    background: var(--surface-2); border: 1px solid var(--line); color: var(--ink-2);
+    font-family: var(--mono-ish); font-size: 14px; letter-spacing: .04em;
+  }
+  .name { margin: 0; font-weight: 600; font-size: 15px; }
+  .car { margin: 1px 0 0; font-size: 12.5px; color: var(--ink-2); }
+  .plate {
+    font-family: var(--mono-ish); font-size: 11.5px; letter-spacing: .05em; color: var(--ink); white-space: nowrap;
+    background: var(--surface-2); border: 1px solid var(--line-strong); border-radius: 4px; padding: 1px 5px;
+  }
+  .queues { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 11px; }
+  .q { font-size: 12px; font-weight: 500; border-radius: 7px; padding: 3px 9px; }
+  .q1 { color: var(--q1); background: var(--q1-bg); }
+  .q2 { color: var(--q2); background: var(--q2-bg); }
+  .q3 { color: var(--q3); background: var(--q3-bg); }
+
+  .seats { display: flex; align-items: center; gap: 9px; padding: 9px 11px; border-radius: 12px; background: var(--surface-2); }
+  .seat-row { display: flex; gap: 3px; font-size: 17px; }
+  .seat-free { color: var(--ok); }
+  .seat-taken { color: var(--ink-3); opacity: .55; }
+  .seats-label { font-size: 12.5px; font-weight: 500; color: var(--ok); }
+  .seats.low { background: var(--warn-bg); }
+  .seats.low .seats-label { color: var(--warn); }
+  .seats.low .seat-free { color: var(--warn); }
+  .note {
+    margin: 10px 0 0; font-size: 12.5px; color: var(--ink-2); line-height: 1.45;
+    padding-left: 10px; border-left: 2px solid var(--line-strong);
+  }
+  .actions { display: flex; gap: 8px; margin-top: 13px; }
+  .btn {
+    font: inherit; font-size: 14px; font-weight: 600; border-radius: 12px; padding: 11px 16px;
+    cursor: pointer; border: 1px solid transparent; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  }
+  .btn-primary { flex: 1; background: var(--accent); color: var(--on-accent); box-shadow: 0 2px 0 var(--accent-deep); }
+  .btn-primary:active { transform: translateY(1px); box-shadow: 0 1px 0 var(--accent-deep); }
+  .btn-icon { width: 44px; padding: 0; background: var(--surface); border-color: var(--line-strong); color: var(--ink); font-size: 17px; }
+  .btn-ghost { flex: 1; background: var(--surface); border-color: var(--line-strong); color: var(--ink-2); }
+
+  .status-line {
+    display: flex; align-items: center; gap: 8px; margin-top: 13px; padding: 10px 12px;
+    border-radius: 12px; background: var(--pend-bg); color: var(--pend); font-size: 13px; font-weight: 500;
+  }
+  .status-line .i { font-size: 15px; }
+
+  .fab {
+    position: absolute; right: 18px; bottom: 88px; z-index: 3;
+    display: inline-flex; align-items: center; gap: 8px; font: inherit; font-size: 14px; font-weight: 600;
+    background: var(--accent); color: var(--on-accent); border: 0; border-radius: 999px;
+    padding: 13px 18px; cursor: pointer; box-shadow: 0 3px 0 var(--accent-deep), var(--shadow);
+  }
+  .fab:active { transform: translateY(1px); box-shadow: 0 2px 0 var(--accent-deep), var(--shadow); }
+
+  .tabbar {
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; background: var(--navbg);
+    padding: 9px 12px 16px; display: flex; justify-content: space-around;
+  }
+  .tap {
+    background: none; border: 0; cursor: pointer; color: var(--navink-2); font: inherit; font-size: 11px;
+    display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 4px 12px; border-radius: 12px; position: relative;
+  }
+  .tap .i { font-size: 21px; }
+  .tap[aria-current="page"] { color: var(--navink); }
+  .tap[aria-current="page"] .i { color: var(--gold); }
+  .tap .badge {
+    position: absolute; top: 0; right: 6px; min-width: 16px; height: 16px; padding: 0 4px;
+    border-radius: 8px; background: var(--warn); color: #fff; font-family: var(--mono-ish);
+    font-size: 10px; line-height: 16px; text-align: center;
+  }
+  .home-bar { position: absolute; left: 50%; transform: translateX(-50%); bottom: 6px; width: 118px; height: 4px; border-radius: 3px; background: var(--navink-2); opacity: .6; z-index: 5; }
+  .caption { margin: 0; font-size: 12.5px; color: var(--ink-3); text-align: center; max-width: 390px; }
+
+  /* ---------- колонка пояснений ---------- */
+  .notes { display: flex; flex-direction: column; gap: 26px; max-width: 620px; }
+  .note-block h2 { font-size: 12px; font-family: var(--mono-ish); font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 12px; }
+  .note-block p { margin: 0 0 10px; color: var(--ink-2); max-width: 62ch; }
+  .note-block p strong { color: var(--ink); font-weight: 600; }
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 10px; }
+  .sw { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface); }
+  .sw .fill { height: 44px; border-bottom: 1px solid var(--line); }
+  .sw .meta { padding: 7px 9px 8px; }
+  .sw .nm { font-size: 12px; font-weight: 600; }
+  .sw .hx { font-family: var(--mono-ish); font-size: 11px; color: var(--ink-3); letter-spacing: .04em; text-transform: uppercase; }
+  .type-rows { display: flex; flex-direction: column; gap: 10px; }
+  .type-row { display: flex; align-items: baseline; gap: 14px; border-bottom: 1px dashed var(--line-strong); padding-bottom: 10px; }
+  .type-row .role { font-family: var(--mono-ish); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); width: 92px; flex: none; }
+  .states { display: flex; flex-wrap: wrap; gap: 8px; }
+  .state { font-size: 13px; font-weight: 500; border-radius: 999px; padding: 6px 13px; }
+  .s-ok { color: var(--ok); background: var(--ok-bg); }
+  .s-low { color: var(--warn); background: var(--warn-bg); }
+  .s-pend { color: var(--pend); background: var(--pend-bg); }
+  .s-done { color: var(--ink-2); background: var(--surface-2); border: 1px solid var(--line); }
+  ul.plain { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 9px; }
+  ul.plain li { display: flex; gap: 10px; color: var(--ink-2); }
+  ul.plain li::before { content: ""; flex: none; width: 7px; height: 7px; margin-top: 8px; border-radius: 50%; background: var(--accent); }
+
+  .reveal { animation: rise .5s cubic-bezier(.22,.7,.3,1) backwards; }
+  @keyframes rise { from { opacity: 0; transform: translateY(10px); } }
+  @media (prefers-reduced-motion: reduce) { .reveal { animation: none; } }
+</style>
+
+<svg aria-hidden="true" style="display:none">
+  <symbol id="ic-bus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="3.5" width="18" height="13" rx="3"/><path d="M3 10h18M9 3.5v6.5"/>
+    <circle cx="7.5" cy="19" r="1.8"/><circle cx="16.5" cy="19" r="1.8"/><path d="M5 16.5v1M19 16.5v1"/>
+  </symbol>
+  <symbol id="ic-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6 9a6 6 0 1 1 12 0c0 4 1.5 5.5 1.5 5.5h-15S6 13 6 9Z"/><path d="M10 18a2 2 0 0 0 4 0"/>
+  </symbol>
+  <symbol id="ic-seat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round">
+    <path d="M7 4.5h10a2 2 0 0 1 2 2v7H5v-7a2 2 0 0 1 2-2Z"/><path d="M4 15h16a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 20 19H4a1.5 1.5 0 0 1-1.5-1.5v-1A1.5 1.5 0 0 1 4 15Z"/>
+  </symbol>
+  <symbol id="ic-seat-f" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M7 4.5h10a2 2 0 0 1 2 2v7H5v-7a2 2 0 0 1 2-2Z"/><rect x="2.5" y="15" width="19" height="4" rx="1.6"/>
+  </symbol>
+  <symbol id="ic-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M7 3.5H4.8A1.8 1.8 0 0 0 3 5.4C3 13.9 10.1 21 18.6 21a1.8 1.8 0 0 0 1.9-1.8V17l-4.2-1.6-2 2a13.6 13.6 0 0 1-5.6-5.6l2-2Z"/>
+  </symbol>
+  <symbol id="ic-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>
+  </symbol>
+  <symbol id="ic-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+    <path d="M12 5v14M5 12h14"/>
+  </symbol>
+  <symbol id="ic-board" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="3" y="4" width="18" height="14" rx="2.5"/><path d="M7 9h6M7 13h9M12 18v2M9 21h6"/>
+  </symbol>
+  <symbol id="ic-route" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.5 6H14a4 4 0 0 1 0 8h-4a4 4 0 0 0 0 8h5.5" stroke-dasharray="2.5 3"/>
+  </symbol>
+  <symbol id="ic-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/>
+  </symbol>
+  <symbol id="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+    <circle cx="12" cy="12" r="4"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"/>
+  </symbol>
+  <symbol id="ic-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/>
+  </symbol>
+</svg>
+
+<div class="page">
+  <header class="pitch-head">
+    <div>
+      <p class="eyebrow">Дизайн-концепт · экран 1 из 9 · палитра «Хвоя»</p>
+      <h1>Доска водителей</h1>
+      <p class="lede">Рейсы нанизаны на маршрутный пунктир, время — самый крупный элемент карточки, свободные места читаются пиктограммами сидений. Палитра утверждена: хвойный зелёный с латунью.</p>
+    </div>
+    <button class="theme-btn" id="themeBtn" type="button">
+      <svg class="i" id="themeIcon"><use href="#ic-moon"/></svg>
+      <span id="themeLabel">Тёмная тема</span>
+    </button>
+  </header>
+
+  <div class="layout">
+    <div class="phone-col">
+      <div class="phone">
+        <div class="status-bar">
+          <span>7:42</span>
+          <span class="dots"><span></span><span></span><span></span><span></span></span>
+        </div>
+
+        <div class="app-head">
+          <div class="brand-row">
+            <span class="mark"><svg class="i"><use href="#ic-bus"/></svg></span>
+            <span>
+              <span class="brand">Подвезём</span><br>
+              <span class="brand-date">Понедельник, 2 сентября</span>
+            </span>
+            <button class="bell" type="button" aria-label="Уведомления: 3 новых"><svg class="i"><use href="#ic-bell"/></svg></button>
+          </div>
+
+          <div class="segmented" role="tablist" aria-label="Доски">
+            <button type="button" role="tab" aria-selected="true">Водители <span class="count">5</span></button>
+            <button type="button" role="tab" aria-selected="false">Запросы <span class="count">3</span></button>
+          </div>
+
+          <div class="dates">
+            <button class="date" type="button"><span class="dow">вс</span><span class="num">1</span></button>
+            <button class="date" type="button" aria-current="date"><span class="dow">пн</span><span class="num">2</span></button>
+            <button class="date" type="button"><span class="dow">вт</span><span class="num">3</span></button>
+            <button class="date" type="button"><span class="dow">ср</span><span class="num">4</span></button>
+            <button class="date" type="button"><span class="dow">чт</span><span class="num">5</span></button>
+            <button class="date" type="button"><span class="dow">пт</span><span class="num">6</span></button>
+            <button class="date dim" type="button"><span class="dow">сб</span><span class="num">7</span></button>
+          </div>
+
+          <div class="filters">
+            <button class="chip" type="button" aria-pressed="true">1 смена <span class="sub">8:00–12:29</span></button>
+            <button class="chip" type="button" aria-pressed="false">2 смена <span class="sub">12:30–19:00</span></button>
+            <button class="chip" type="button" aria-pressed="false">Моя очередь · 2</button>
+          </div>
+        </div>
+
+        <div class="board">
+          <p class="board-note"><span><strong>5 поездок</strong> на сегодня · 9 свободных мест</span><span class="link">Все очереди</span></p>
+
+          <div class="route">
+            <article class="ride is-open reveal" style="animation-delay:.05s">
+              <div class="ride-card">
+                <div class="ride-top">
+                  <span class="time">08:15</span><span class="time-note">в школе</span>
+                  <span class="shift">1 смена</span>
+                </div>
+                <div class="who">
+                  <span class="avatar">ИК</span>
+                  <div>
+                    <p class="name">Ирина Ковалёва</p>
+                    <p class="car">Renault Duster · синий · <span class="plate">А123ВС 150</span></p>
+                  </div>
+                </div>
+                <div class="queues"><span class="q q1">1 очередь</span><span class="q q2">2 очередь</span></div>
+                <div class="seats">
+                  <span class="seat-row">
+                    <svg class="i seat-taken"><use href="#ic-seat-f"/></svg>
+                    <svg class="i seat-taken"><use href="#ic-seat-f"/></svg>
+                    <svg class="i seat-free"><use href="#ic-seat"/></svg>
+                    <svg class="i seat-free"><use href="#ic-seat"/></svg>
+                  </span>
+                  <span class="seats-label">2 места свободны</span>
+                </div>
+                <p class="note">Могу забрать пораньше, если напишете с вечера.</p>
+                <div class="actions">
+                  <button class="btn btn-primary" type="button">Откликнуться</button>
+                  <button class="btn btn-icon" type="button" aria-label="Позвонить Ирине"><svg class="i"><use href="#ic-phone"/></svg></button>
+                </div>
+              </div>
+            </article>
+
+            <article class="ride is-open reveal" style="animation-delay:.12s">
+              <div class="ride-card">
+                <div class="ride-top">
+                  <span class="time">08:30</span><span class="time-note">в школе</span>
+                  <span class="shift">1 смена</span>
+                </div>
+                <div class="who">
+                  <span class="avatar">ДП</span>
+                  <div>
+                    <p class="name">Дмитрий Панов</p>
+                    <p class="car">Kia Rio · белый · <span class="plate">В456ЕК 190</span></p>
+                  </div>
+                </div>
+                <div class="queues"><span class="q q3">3 очередь</span></div>
+                <div class="seats low">
+                  <span class="seat-row">
+                    <svg class="i seat-taken"><use href="#ic-seat-f"/></svg>
+                    <svg class="i seat-taken"><use href="#ic-seat-f"/></svg>
+                    <svg class="i seat-free"><use href="#ic-seat"/></svg>
+                  </span>
+                  <span class="seats-label">Осталось 1 место</span>
+                </div>
+                <div class="actions">
+                  <button class="btn btn-primary" type="button">Откликнуться</button>
+                  <button class="btn btn-icon" type="button" aria-label="Позвонить Дмитрию"><svg class="i"><use href="#ic-phone"/></svg></button>
+                </div>
+              </div>
+            </article>
+
+            <article class="ride is-pending reveal" style="animation-delay:.19s">
+              <div class="ride-card">
+                <div class="ride-top">
+                  <span class="time">08:40</span><span class="time-note">в школе</span>
+                  <span class="shift">1 смена</span>
+                </div>
+                <div class="who">
+                  <span class="avatar">МШ</span>
+                  <div>
+                    <p class="name">Марина Швец</p>
+                    <p class="car">Lada Vesta · серый · <span class="plate">Е789МН 150</span></p>
+                  </div>
+                </div>
+                <div class="queues"><span class="q q1">1 очередь</span><span class="q q3">3 очередь</span></div>
+                <div class="status-line">
+                  <svg class="i"><use href="#ic-clock"/></svg>
+                  Вы отправили отклик на 2 детей — ждём ответа Марины
+                </div>
+                <div class="actions">
+                  <button class="btn btn-ghost" type="button">Отменить отклик</button>
+                  <button class="btn btn-icon" type="button" aria-label="Позвонить Марине"><svg class="i"><use href="#ic-phone"/></svg></button>
+                </div>
+              </div>
+            </article>
+
+            <article class="ride is-open reveal" style="animation-delay:.26s">
+              <div class="ride-card">
+                <div class="ride-top">
+                  <span class="time">13:50</span><span class="time-note">в школе</span>
+                  <span class="shift">2 смена</span>
+                </div>
+                <div class="who">
+                  <span class="avatar">АГ</span>
+                  <div>
+                    <p class="name">Алексей Громов</p>
+                    <p class="car">Hyundai Creta · чёрный · <span class="plate">К321РС 750</span></p>
+                  </div>
+                </div>
+                <div class="queues"><span class="q q1">1 очередь</span><span class="q q2">2 очередь</span><span class="q q3">3 очередь</span></div>
+                <div class="seats">
+                  <span class="seat-row">
+                    <svg class="i seat-taken"><use href="#ic-seat-f"/></svg>
+                    <svg class="i seat-free"><use href="#ic-seat"/></svg>
+                    <svg class="i seat-free"><use href="#ic-seat"/></svg>
+                    <svg class="i seat-free"><use href="#ic-seat"/></svg>
+                  </span>
+                  <span class="seats-label">3 места свободны</span>
+                </div>
+                <div class="actions">
+                  <button class="btn btn-primary" type="button">Откликнуться</button>
+                  <button class="btn btn-icon" type="button" aria-label="Позвонить Алексею"><svg class="i"><use href="#ic-phone"/></svg></button>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <button class="fab" type="button"><svg class="i"><use href="#ic-plus"/></svg> Поездка</button>
+
+        <nav class="tabbar">
+          <button class="tap" type="button" aria-current="page"><svg class="i"><use href="#ic-board"/></svg>Доска</button>
+          <button class="tap" type="button"><svg class="i"><use href="#ic-route"/></svg>Поездки<span class="badge">2</span></button>
+          <button class="tap" type="button"><svg class="i"><use href="#ic-user"/></svg>Профиль</button>
+        </nav>
+        <span class="home-bar"></span>
+      </div>
+      <p class="caption">Экран прокручивается внутри рамки. Кнопка вверху переключает светлую и тёмную тему.</p>
+    </div>
+
+    <aside class="notes">
+      <section class="note-block">
+        <h2>Направление · Хвоя</h2>
+        <p>Глубокий хвойный зелёный с латунью — спокойный загородный тон: посёлок, лес вдоль дороги, утро. Взрослый и сдержанный, без «детского» сюсюканья, и хорошо читается на солнце — это важно, приложение открывают на улице у машины.</p>
+        <p>Работает правило одного громкого цвета: <strong>хвойный</strong> достаётся только главному действию («Откликнуться», кнопка новой поездки, сегодняшний день), <strong>латунь</strong> — служебным акцентам (точки маршрута, активная вкладка). Нейтрали подкрашены в зелёный, поэтому серый нигде не выглядит «компьютерным».</p>
+      </section>
+
+      <section class="note-block">
+        <h2>Палитра · активная тема</h2>
+        <div class="swatches" id="swatches">
+          <div class="sw" data-token="--accent"><div class="fill"></div><div class="meta"><div class="nm">Хвойный</div><div class="hx"></div></div></div>
+          <div class="sw" data-token="--gold"><div class="fill"></div><div class="meta"><div class="nm">Латунь</div><div class="hx"></div></div></div>
+          <div class="sw" data-token="--ink"><div class="fill"></div><div class="meta"><div class="nm">Текст</div><div class="hx"></div></div></div>
+          <div class="sw" data-token="--paper"><div class="fill"></div><div class="meta"><div class="nm">Фон</div><div class="hx"></div></div></div>
+          <div class="sw" data-token="--ok"><div class="fill"></div><div class="meta"><div class="nm">Есть места</div><div class="hx"></div></div></div>
+          <div class="sw" data-token="--warn"><div class="fill"></div><div class="meta"><div class="nm">Мест мало</div><div class="hx"></div></div></div>
+        </div>
+        <p style="margin-top:12px">Коды обновляются под текущую тему. Полный набор переменных лежит в <strong>design/tokens.css</strong> — он уйдёт в код приложения без изменений.</p>
+      </section>
+
+      <section class="note-block">
+        <h2>Очереди</h2>
+        <p>Каждая из трёх очередей получает собственный цвет и держится за ним во всём приложении, чтобы «свою» очередь можно было ловить взглядом, не читая подписи.</p>
+        <div class="states">
+          <span class="state q1">1 очередь</span>
+          <span class="state q2">2 очередь</span>
+          <span class="state q3">3 очередь</span>
+        </div>
+      </section>
+
+      <section class="note-block">
+        <h2>Шрифты</h2>
+        <div class="type-rows">
+          <div class="type-row"><span class="role">Интерфейс</span><span style="font-size:19px;font-weight:600">Golos Text — родная кириллица</span></div>
+          <div class="type-row"><span class="role">Время</span><span style="font-family:var(--mono-ish);font-size:28px;font-variant-numeric:tabular-nums">08:15 · 13:50</span></div>
+          <div class="type-row"><span class="role">Метки</span><span style="font-family:var(--mono-ish);font-size:13px;letter-spacing:.12em;text-transform:uppercase">1 смена · 2 очередь</span></div>
+        </div>
+        <p style="margin-top:12px">Узкий Oswald отвечает только за цифры и служебные метки — тот же голос, что на вокзальных табло. Всё остальное набрано Golos Text, спроектированным под русский текст.</p>
+      </section>
+
+      <section class="note-block">
+        <h2>Состояния поездки</h2>
+        <div class="states">
+          <span class="state s-ok">Есть места</span>
+          <span class="state s-low">Осталось 1 место</span>
+          <span class="state s-pend">Ждёт подтверждения</span>
+          <span class="state s-done">Доставлены</span>
+        </div>
+        <p style="margin-top:12px">Состояние всегда закодировано дважды — цветом и словом, — чтобы карточка читалась и на солнце, и при дальтонизме. Заполненная поездка исчезает с доски и остаётся только в разделе «Поездки».</p>
+      </section>
+
+      <section class="note-block">
+        <h2>Что дальше</h2>
+        <ul class="plain">
+          <li>Доска запросов — та же сетка, но карточка строится вокруг адреса и очереди заказчика.</li>
+          <li>Форма отклика: выбор детей из профиля, ограничение по свободным местам, комментарий.</li>
+          <li>Экран водителя «Отклики на мою поездку» с подтверждением и авто-пересчётом мест.</li>
+          <li>Мои поездки: активные сверху, кнопка «Закончить поездку» — только у водителя.</li>
+          <li>Профиль с переключателем «Я водитель» и списком детей.</li>
+          <li>Экран создания поездки, включая повтор по дням недели на месяц вперёд.</li>
+        </ul>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    var themeBtn = document.getElementById('themeBtn');
+    var themeIcon = document.getElementById('themeIcon').querySelector('use');
+    var themeLabel = document.getElementById('themeLabel');
+    var swatches = Array.prototype.slice.call(document.querySelectorAll('#swatches .sw'));
+
+    function toHex(value) {
+      var m = String(value).trim().match(/^rgba?\((\d+)[,\s]+(\d+)[,\s]+(\d+)/i);
+      if (!m) return String(value).trim().toUpperCase();
+      return '#' + [m[1], m[2], m[3]].map(function (n) {
+        var h = parseInt(n, 10).toString(16);
+        return h.length === 1 ? '0' + h : h;
+      }).join('').toUpperCase();
+    }
+
+    function paintSwatches() {
+      var cs = getComputedStyle(root);
+      swatches.forEach(function (sw) {
+        var value = cs.getPropertyValue(sw.getAttribute('data-token'));
+        sw.querySelector('.fill').style.background = value;
+        sw.querySelector('.hx').textContent = toHex(value);
+      });
+    }
+
+    function currentTheme() {
+      var set = root.getAttribute('data-theme');
+      if (set) return set;
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    function paintTheme() {
+      var dark = currentTheme() === 'dark';
+      themeIcon.setAttribute('href', dark ? '#ic-sun' : '#ic-moon');
+      themeLabel.textContent = dark ? 'Светлая тема' : 'Тёмная тема';
+      paintSwatches();
+    }
+
+    themeBtn.addEventListener('click', function () {
+      var next = currentTheme() === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      try { localStorage.setItem('transfer-theme', next); } catch (e) {}
+      paintTheme();
+    });
+
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    if (mq.addEventListener) mq.addEventListener('change', paintTheme);
+    else if (mq.addListener) mq.addListener(paintTheme);
+
+    try {
+      var saved = localStorage.getItem('transfer-theme');
+      if (saved) root.setAttribute('data-theme', saved);
+    } catch (e) {}
+
+    paintTheme();
+  })();
+</script>

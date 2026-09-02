@@ -1,0 +1,27 @@
+# зависимости и сборка
+node_modules/
+dist/
+.vite/
+
+# секреты и локальные настройки
+.env
+.env.local
+.env.*.local
+*.local
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+serviceAccountKey.json
+
+# системное
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# редакторы
+.vscode/
+.idea/
+*.swp
