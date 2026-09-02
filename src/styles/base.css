@@ -1,0 +1,190 @@
+/* ==========================================================================
+   Базовый слой: сброс, оболочка экрана, шапка, нижняя навигация.
+   Цвета, шрифты и радиусы — только через переменные из tokens.css.
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button { font: inherit; color: inherit; }
+
+a { color: var(--accent); }
+
+h1, h2, h3, p { margin: 0; }
+
+/* --------------------------------------------------------------------------
+   Оболочка: шапка сверху, прокручиваемое содержимое, навигация снизу.
+   На десктопе приложение остаётся колонкой шириной с телефон.
+   -------------------------------------------------------------------------- */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--paper);
+  position: relative;
+  overflow: hidden;
+}
+
+@media (min-width: 520px) {
+  body { background: var(--surface-2); }
+  .app { box-shadow: var(--shadow); }
+}
+
+/* --- шапка --- */
+
+.app-head {
+  flex: none;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  padding: calc(env(safe-area-inset-top) + 14px) 16px 12px;
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px),
+                    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.brand-row { display: flex; align-items: center; gap: 10px; }
+
+.brand-mark {
+  width: 34px; height: 34px; flex: none;
+  display: grid; place-items: center;
+  border-radius: var(--r-md);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+}
+
+.brand { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+
+.brand-date {
+  font-family: var(--mono-ish);
+  font-size: 12px;
+  color: var(--ink-3);
+  text-transform: lowercase;
+}
+
+/* --- содержимое --- */
+
+.screen {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.screen-title { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+
+.muted { color: var(--ink-2); }
+
+/* Заглушка экрана, который появится в одной из следующих сессий. */
+.placeholder {
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  padding: 22px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.placeholder .tag {
+  align-self: flex-start;
+  font-family: var(--mono-ish);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+/* --- переключатель досок --- */
+
+.segmented {
+  display: flex;
+  gap: 4px;
+  margin-top: 12px;
+  padding: 3px;
+  border-radius: var(--r-pill);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+
+.segmented a {
+  flex: 1;
+  text-align: center;
+  padding: 8px 10px;
+  border-radius: var(--r-pill);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
+  text-decoration: none;
+}
+
+.segmented a[aria-current="page"] {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+}
+
+/* --- нижняя навигация --- */
+
+.tabbar {
+  flex: none;
+  display: flex;
+  justify-content: space-around;
+  background: var(--navbg);
+  padding: 9px 12px calc(env(safe-area-inset-bottom) + 12px);
+}
+
+.tap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 14px;
+  border: 0;
+  border-radius: var(--r-md);
+  background: none;
+  color: var(--navink-2);
+  font-size: 11px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.tap svg { width: 22px; height: 22px; }
+
+.tap[aria-current="page"] { color: var(--navink); }
+.tap[aria-current="page"] svg { color: var(--gold); }
+
+/* --- предупреждение о ненастроенном Firebase --- */
+
+.config-notice {
+  margin: 0 16px 12px;
+  padding: 12px 14px;
+  border-radius: var(--r-md);
+  background: var(--warn-bg);
+  color: var(--warn);
+  font-size: 13px;
+  border: 1px solid currentColor;
+}
+
+.config-notice code {
+  font-family: var(--mono-ish);
+  font-size: 12px;
+}
