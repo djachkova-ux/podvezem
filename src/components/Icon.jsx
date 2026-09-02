@@ -30,17 +30,41 @@ const paths = {
       <path d="M4.5 20a7.5 7.5 0 0 1 15 0" />
     </>
   ),
+  seat: (
+    <>
+      <path d="M7 4.5h10a2 2 0 0 1 2 2v7H5v-7a2 2 0 0 1 2-2Z" />
+      <path d="M4 15h16a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 20 19H4a1.5 1.5 0 0 1-1.5-1.5v-1A1.5 1.5 0 0 1 4 15Z" />
+    </>
+  ),
+  seatFilled: (
+    <>
+      <path d="M7 4.5h10a2 2 0 0 1 2 2v7H5v-7a2 2 0 0 1 2-2Z" />
+      <rect x="2.5" y="15" width="19" height="4" rx="1.6" />
+    </>
+  ),
+  phone: (
+    <path d="M7 3.5H4.8A1.8 1.8 0 0 0 3 5.4C3 13.9 10.1 21 18.6 21a1.8 1.8 0 0 0 1.9-1.8V17l-4.2-1.6-2 2a13.6 13.6 0 0 1-5.6-5.6l2-2Z" />
+  ),
+  clock: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.5V12l3 2" />
+    </>
+  ),
 };
+
+const filledIcons = new Set(['seatFilled']);
 
 export default function Icon({ name, ...rest }) {
   const shape = paths[name];
   if (!shape) return null;
+  const filled = filledIcons.has(name);
 
   return (
     <svg
       viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
+      fill={filled ? 'currentColor' : 'none'}
+      stroke={filled ? 'none' : 'currentColor'}
       strokeWidth="1.8"
       strokeLinecap="round"
       strokeLinejoin="round"
