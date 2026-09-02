@@ -3,6 +3,7 @@ import AppHead from './components/AppHead.jsx';
 import TabBar from './components/TabBar.jsx';
 import DriversBoard from './screens/DriversBoard.jsx';
 import RequestsBoard from './screens/RequestsBoard.jsx';
+import NewOffer from './screens/NewOffer.jsx';
 import MyTrips from './screens/MyTrips.jsx';
 import Profile from './screens/Profile.jsx';
 import Login from './screens/Login.jsx';
@@ -49,6 +50,7 @@ export default function App() {
         <Route path="/" element={<Navigate to="/board/drivers" replace />} />
         <Route path="/board" element={<Navigate to="/board/drivers" replace />} />
         <Route path="/board/drivers" element={<DriversBoard />} />
+        <Route path="/board/drivers/new" element={<NewOffer />} />
         <Route path="/board/requests" element={<RequestsBoard />} />
         <Route path="/trips" element={<MyTrips />} />
         <Route path="/profile" element={<Profile />} />

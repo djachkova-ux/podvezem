@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { subscribeRideOffers } from '../lib/db.js';
 import { getShift, toDateKey } from '../lib/dates.js';
 import DateStrip from '../components/DateStrip.jsx';
 import ShiftFilter from '../components/ShiftFilter.jsx';
 import RideCard from '../components/RideCard.jsx';
+import Icon from '../components/Icon.jsx';
 
 function seatsWord(count) {
   const mod10 = count % 10;
@@ -39,37 +41,46 @@ export default function DriversBoard() {
   const freeSeats = filtered.reduce((sum, offer) => sum + offer.seatsFree, 0);
 
   return (
-    <main className="screen">
-      <DateStrip selectedKey={dateKey} onSelect={setDateKey} />
-      <ShiftFilter
-        shift={shift}
-        onShiftChange={setShift}
-        homeQueue={profile?.homeQueue}
-        onlyMyQueue={onlyMyQueue}
-        onToggleMyQueue={() => setOnlyMyQueue((value) => !value)}
-      />
+    <>
+      <main className="screen">
+        <DateStrip selectedKey={dateKey} onSelect={setDateKey} />
+        <ShiftFilter
+          shift={shift}
+          onShiftChange={setShift}
+          homeQueue={profile?.homeQueue}
+          onlyMyQueue={onlyMyQueue}
+          onToggleMyQueue={() => setOnlyMyQueue((value) => !value)}
+        />
 
-      <p className="board-note">
-        <span>
-          <strong>{filtered.length} поездок</strong> на этот день · {freeSeats} {seatsWord(freeSeats)}
-        </span>
-      </p>
+        <p className="board-note">
+          <span>
+            <strong>{filtered.length} поездок</strong> на этот день · {freeSeats} {seatsWord(freeSeats)}
+          </span>
+        </p>
 
-      {offers === null && <p className="muted">Загрузка…</p>}
+        {offers === null && <p className="muted">Загрузка…</p>}
 
-      {offers !== null && filtered.length === 0 && (
-        <p className="board-empty">На эту дату подходящих поездок пока нет.</p>
+        {offers !== null && filtered.length === 0 && (
+          <p className="board-empty">На эту дату подходящих поездок пока нет.</p>
+        )}
+
+        {filtered.length > 0 && (
+          <div className="route">
+            {filtered.map((offer) => (
+              <article key={offer.id} className="ride is-open">
+                <RideCard offer={offer} isOwn={offer.driverId === user?.uid} />
+              </article>
+            ))}
+          </div>
+        )}
+      </main>
+
+      {profile?.isDriver && (
+        <Link to="/board/drivers/new" className="fab">
+          <Icon name="plus" className="i" />
+          Поездка
+        </Link>
       )}
-
-      {filtered.length > 0 && (
-        <div className="route">
-          {filtered.map((offer) => (
-            <article key={offer.id} className="ride is-open">
-              <RideCard offer={offer} isOwn={offer.driverId === user?.uid} />
-            </article>
-          ))}
-        </div>
-      )}
-    </main>
+    </>
   );
 }

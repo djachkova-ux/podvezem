@@ -51,6 +51,7 @@ const paths = {
       <path d="M12 7.5V12l3 2" />
     </>
   ),
+  plus: <path d="M12 5v14M5 12h14" />,
 };
 
 const filledIcons = new Set(['seatFilled']);

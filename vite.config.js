@@ -8,7 +8,7 @@ export default defineConfig({
     // оказывается недоступен. Явный 127.0.0.1 лечит это.
     // Открыть с телефона в той же сети: npm run dev -- --host
     host: '127.0.0.1',
-    port: 5173,
+    port: Number(process.env.PORT) || 5173,
   },
   build: {
     outDir: 'dist',

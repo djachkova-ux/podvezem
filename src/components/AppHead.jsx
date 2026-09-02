@@ -9,7 +9,7 @@ const boards = [
 
 export default function AppHead() {
   const { pathname } = useLocation();
-  const onBoard = pathname.startsWith('/board');
+  const onBoard = boards.some((board) => board.to === pathname);
 
   return (
     <header className="app-head">

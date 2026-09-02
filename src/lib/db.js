@@ -2,6 +2,7 @@
 // Коллекция запросов заказчиков добавится в S5.
 
 import {
+  addDoc,
   collection,
   doc,
   onSnapshot,
@@ -48,4 +49,26 @@ export function subscribeRideOffers(dateKey, callback) {
       .sort((a, b) => a.arrivalTime.localeCompare(b.arrivalTime));
     callback(offers);
   });
+}
+
+/**
+ * Публикация нового предложения водителем. Данные о водителе и авто
+ * берутся снимком из профиля на момент публикации (см. rideOffers в S3).
+ */
+export function createRideOffer(uid, profile, { date, arrivalTime, seatsTotal, note }) {
+  const payload = {
+    driverId: uid,
+    driverName: profile.name,
+    driverPhone: profile.phone,
+    driverCar: profile.car,
+    pickupQueues: profile.pickupQueues,
+    date,
+    arrivalTime,
+    seatsTotal,
+    seatsFree: seatsTotal,
+    status: 'open',
+    createdAt: serverTimestamp(),
+  };
+  if (note) payload.note = note;
+  return addDoc(collection(db, 'rideOffers'), payload);
 }

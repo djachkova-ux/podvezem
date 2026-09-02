@@ -108,3 +108,13 @@
   border: 1px dashed var(--line-strong); border-radius: var(--r-lg); background: var(--surface);
   padding: 22px 18px; text-align: center; color: var(--ink-2); font-size: 14px;
 }
+
+.fab {
+  position: absolute; right: 18px; bottom: calc(env(safe-area-inset-bottom) + 78px); z-index: 3;
+  display: inline-flex; align-items: center; gap: 8px; font: inherit; font-size: 14px; font-weight: 600;
+  background: var(--accent); color: var(--on-accent); border: 0; border-radius: 999px;
+  padding: 13px 18px; cursor: pointer; box-shadow: 0 3px 0 var(--accent-deep), var(--shadow);
+  text-decoration: none;
+}
+.fab:active { transform: translateY(1px); box-shadow: 0 2px 0 var(--accent-deep), var(--shadow); }
+.fab .i { width: 18px; height: 18px; }
