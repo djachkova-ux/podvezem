@@ -83,7 +83,7 @@ export default function OfferResponses() {
   useEffect(() => {
     if (!user) return undefined;
     setResponses(null);
-    return subscribeOfferResponses(offerId, setResponses);
+    return subscribeOfferResponses(offerId, user.uid, setResponses);
   }, [user, offerId]);
 
   if (offer === undefined || responses === null) {

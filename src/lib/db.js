@@ -150,9 +150,20 @@ export function createResponse(uid, profile, offer, { childrenIds, note }) {
 /**
  * Подписка на отклики к конкретному предложению — экран водителя
  * «Отклики». Сортировка по времени создания на клиенте (без индекса).
+ * Фильтр по `offerDriverId` здесь не для логики (все отклики предложения и
+ * так принадлежат его водителю), а потому что правило чтения проверяет
+ * именно это поле — Firestore не вычисляет правила построчно для list-
+ * запросов, а статически убеждается, что запрос не может вернуть документ,
+ * не проходящий правило; без явного фильтра по полю из правила весь запрос
+ * получает permission-denied, даже если каждый документ по отдельности
+ * прошёл бы проверку.
  */
-export function subscribeOfferResponses(offerId, callback) {
-  const responsesQuery = query(collection(db, 'responses'), where('offerId', '==', offerId));
+export function subscribeOfferResponses(offerId, driverUid, callback) {
+  const responsesQuery = query(
+    collection(db, 'responses'),
+    where('offerId', '==', offerId),
+    where('offerDriverId', '==', driverUid),
+  );
   return onSnapshot(responsesQuery, (snap) => {
     const responses = snap.docs
       .map((item) => ({ id: item.id, ...item.data() }))
