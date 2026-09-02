@@ -17,5 +17,13 @@ service cloud.firestore {
       allow create: if request.auth != null && request.auth.uid == request.resource.data.driverId;
       allow update, delete: if request.auth != null && request.auth.uid == resource.data.driverId;
     }
+
+    // Запросы заказчиков на трансфер — читают все авторизованные,
+    // создаёт и меняет только сам заказчик (владелец запроса).
+    match /requests/{requestId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.customerId;
+      allow update, delete: if request.auth != null && request.auth.uid == resource.data.customerId;
+    }
   }
 }

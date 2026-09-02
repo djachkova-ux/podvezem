@@ -1,5 +1,5 @@
-// Firestore. Профиль пользователя (S2) и предложения поездок водителей (S3).
-// Коллекция запросов заказчиков добавится в S5.
+// Firestore. Профиль пользователя (S2), предложения поездок водителей (S3-S4)
+// и запросы заказчиков (S5).
 
 import {
   addDoc,
@@ -71,4 +71,44 @@ export function createRideOffer(uid, profile, { date, arrivalTime, seatsTotal, n
   };
   if (note) payload.note = note;
   return addDoc(collection(db, 'rideOffers'), payload);
+}
+
+/**
+ * Подписка на открытые запросы заказчиков на конкретную дату.
+ * Сортировка по времени — на клиенте, как и для rideOffers.
+ */
+export function subscribeRequests(dateKey, callback) {
+  const requestsQuery = query(
+    collection(db, 'requests'),
+    where('date', '==', dateKey),
+    where('status', '==', 'open'),
+  );
+  return onSnapshot(requestsQuery, (snap) => {
+    const requests = snap.docs
+      .map((item) => ({ id: item.id, ...item.data() }))
+      .sort((a, b) => a.arrivalTime.localeCompare(b.arrivalTime));
+    callback(requests);
+  });
+}
+
+/**
+ * Публикация нового запроса заказчиком. Адрес и очередь — снимком из
+ * профиля; дети — выбранное подмножество из своего списка (childrenIds).
+ */
+export function createRequest(uid, profile, { date, arrivalTime, childrenIds, note }) {
+  const children = profile.children.filter((child) => childrenIds.includes(child.id));
+  const payload = {
+    customerId: uid,
+    customerName: profile.name,
+    customerPhone: profile.phone,
+    address: profile.address,
+    homeQueue: profile.homeQueue,
+    children,
+    date,
+    arrivalTime,
+    status: 'open',
+    createdAt: serverTimestamp(),
+  };
+  if (note) payload.note = note;
+  return addDoc(collection(db, 'requests'), payload);
 }
