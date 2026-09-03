@@ -5,6 +5,7 @@ import {
   addDoc,
   collection,
   doc,
+  getDoc,
   onSnapshot,
   query,
   runTransaction,
@@ -287,4 +288,111 @@ export async function confirmRequestResponse(response) {
 /** Отклонение отклика водителя заказчиком — без изменения запроса. */
 export function rejectRequestResponse(responseId) {
   return updateDoc(doc(db, 'requestResponses', responseId), { status: 'rejected' });
+}
+
+// --- Мои поездки (S8) ---------------------------------------------------
+// Активная поездка — это подтверждённый (`confirmed`) или уже завершённый
+// (`delivered`) документ `responses`/`requestResponses`. У пользователя
+// может быть до четырёх ролей одновременно (роли не взаимоисключающие),
+// поэтому четыре независимых подписки, каждая фильтрует по тому полю,
+// которое проверяет правило `read` (см. уроки S6/S7 выше). Статус не
+// фильтруется на сервере — экран сам делит на «активные»/«архив» и
+// игнорирует `pending`/`rejected`/`cancelled`.
+
+/** Мои поездки как заказчика по предложениям водителей. */
+export function subscribeResponsesAsCustomer(uid, callback) {
+  const q = query(collection(db, 'responses'), where('customerId', '==', uid));
+  return onSnapshot(q, (snap) => callback(snap.docs.map((item) => ({ id: item.id, ...item.data() }))));
+}
+
+/** Мои поездки как водителя по своим предложениям. */
+export function subscribeResponsesAsDriver(uid, callback) {
+  const q = query(collection(db, 'responses'), where('offerDriverId', '==', uid));
+  return onSnapshot(q, (snap) => callback(snap.docs.map((item) => ({ id: item.id, ...item.data() }))));
+}
+
+/** Мои поездки как водителя по чужим запросам. */
+export function subscribeRequestResponsesAsDriver(uid, callback) {
+  const q = query(collection(db, 'requestResponses'), where('driverId', '==', uid));
+  return onSnapshot(q, (snap) => callback(snap.docs.map((item) => ({ id: item.id, ...item.data() }))));
+}
+
+/** Мои поездки как заказчика по своим запросам. */
+export function subscribeRequestResponsesAsCustomer(uid, callback) {
+  const q = query(collection(db, 'requestResponses'), where('requestCustomerId', '==', uid));
+  return onSnapshot(q, (snap) => callback(snap.docs.map((item) => ({ id: item.id, ...item.data() }))));
+}
+
+/**
+ * Разовое чтение предложения/запроса — для карточки «моя поездка», где
+ * нужны контакты второй стороны, которых нет на самом отклике (см. хэндофф
+ * S8: `responses` хранит снимок заказчика, но не водителя, и наоборот у
+ * `requestResponses`). Реального времени тут не нужно, `onSnapshot` был бы
+ * избыточен.
+ */
+export async function getRideOffer(offerId) {
+  const snap = await getDoc(doc(db, 'rideOffers', offerId));
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+}
+
+export async function getRequest(requestId) {
+  const snap = await getDoc(doc(db, 'requests', requestId));
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+}
+
+/**
+ * Заказчик снимает подтверждённый резерв на предложение водителя (п. 7.7
+ * ТЗ). Места возвращаются, предложение переоткрывается, если было закрыто.
+ * Транзакция симметрична `confirmResponse`.
+ */
+export async function cancelResponse(response) {
+  const offerRef = doc(db, 'rideOffers', response.offerId);
+  const responseRef = doc(db, 'responses', response.id);
+
+  await runTransaction(db, async (tx) => {
+    const [offerSnap, responseSnap] = await Promise.all([tx.get(offerRef), tx.get(responseRef)]);
+    if (!offerSnap.exists() || !responseSnap.exists()) {
+      throw new Error('not-found');
+    }
+    if (responseSnap.data().status !== 'confirmed') {
+      throw new Error('already-handled');
+    }
+
+    const offerData = offerSnap.data();
+    const seatsFree = offerData.seatsFree + response.children.length;
+    tx.update(offerRef, { seatsFree, status: 'open' });
+    tx.update(responseRef, { status: 'cancelled' });
+  });
+}
+
+/** Водитель завершает поездку по своему предложению — просто смена статуса. */
+export function completeResponse(responseId) {
+  return updateDoc(doc(db, 'responses', responseId), { status: 'delivered' });
+}
+
+/**
+ * Заказчик снимает подтверждённый резерв на запрос (п. 8.4 ТЗ, симметрично
+ * п. 7.7). У запроса нет счётчика мест — просто возвращаем `status: 'open'`.
+ */
+export async function cancelRequestResponse(response) {
+  const requestRef = doc(db, 'requests', response.requestId);
+  const responseRef = doc(db, 'requestResponses', response.id);
+
+  await runTransaction(db, async (tx) => {
+    const [requestSnap, responseSnap] = await Promise.all([tx.get(requestRef), tx.get(responseRef)]);
+    if (!requestSnap.exists() || !responseSnap.exists()) {
+      throw new Error('not-found');
+    }
+    if (responseSnap.data().status !== 'confirmed') {
+      throw new Error('already-handled');
+    }
+
+    tx.update(requestRef, { status: 'open' });
+    tx.update(responseRef, { status: 'cancelled' });
+  });
+}
+
+/** Водитель завершает поездку по чужому запросу — просто смена статуса. */
+export function completeRequestResponse(responseId) {
+  return updateDoc(doc(db, 'requestResponses', responseId), { status: 'delivered' });
 }

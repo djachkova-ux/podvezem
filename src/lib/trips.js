@@ -1,0 +1,116 @@
+// Сборка «моих поездок» (S8) из четырёх сырых списков Firestore в единую
+// плоскую структуру для TripCard. Вынесено из MyTrips.jsx — чистая логика,
+// не JSX, отдельно проще перечитывать и держать экран компактным.
+
+const dateFormat = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long' });
+
+function formatDateLabel(dateKey) {
+  const [year, month, day] = dateKey.split('-').map(Number);
+  return dateFormat.format(new Date(year, month - 1, day));
+}
+
+function childrenWord(count) {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 === 1 && mod100 !== 11) return 'ребёнок';
+  if ([2, 3, 4].includes(mod10) && ![12, 13, 14].includes(mod100)) return 'ребёнка';
+  return 'детей';
+}
+
+function childrenLabel(children) {
+  const count = children.length;
+  return `${count} ${childrenWord(count)}: ${children.map((child) => child.name).join(', ')}`;
+}
+
+/**
+ * Собирает единый список поездок из четырёх ролей пользователя. `offerCache`
+ * и `requestCache` — разово подгруженные rideOffers/requests для ролей, у
+ * которых на самом отклике нет данных второй стороны (см. хэндофф S8).
+ * Возвращает только `confirmed`/`delivered` — остальные статусы экрану не нужны.
+ */
+export function buildTrips({ respCustomer, respDriver, reqRespDriver, reqRespCustomer, offerCache, requestCache }) {
+  const list = [];
+
+  for (const r of respCustomer) {
+    const offer = offerCache[r.offerId];
+    list.push({
+      key: `resp-${r.id}`,
+      kind: 'response',
+      id: r.id,
+      raw: r,
+      myRole: 'customer',
+      status: r.status,
+      date: r.date,
+      arrivalTime: r.arrivalTime,
+      dateLabel: formatDateLabel(r.date),
+      otherName: offer?.driverName,
+      otherPhone: offer?.driverPhone,
+      otherCar: offer?.driverCar,
+      queues: offer?.pickupQueues,
+      childrenLabel: childrenLabel(r.children),
+      note: r.note,
+    });
+  }
+
+  for (const r of respDriver) {
+    list.push({
+      key: `resp-${r.id}`,
+      kind: 'response',
+      id: r.id,
+      raw: r,
+      myRole: 'driver',
+      status: r.status,
+      date: r.date,
+      arrivalTime: r.arrivalTime,
+      dateLabel: formatDateLabel(r.date),
+      otherName: r.customerName,
+      otherPhone: r.customerPhone,
+      address: r.address,
+      queues: [r.homeQueue],
+      childrenLabel: childrenLabel(r.children),
+      note: r.note,
+    });
+  }
+
+  for (const r of reqRespDriver) {
+    const request = requestCache[r.requestId];
+    list.push({
+      key: `reqresp-${r.id}`,
+      kind: 'requestResponse',
+      id: r.id,
+      raw: r,
+      myRole: 'driver',
+      status: r.status,
+      date: r.date,
+      arrivalTime: r.arrivalTime,
+      dateLabel: formatDateLabel(r.date),
+      otherName: request?.customerName,
+      otherPhone: request?.customerPhone,
+      address: request?.address,
+      queues: request ? [request.homeQueue] : [],
+      childrenLabel: request ? childrenLabel(request.children) : '',
+      note: r.note,
+    });
+  }
+
+  for (const r of reqRespCustomer) {
+    list.push({
+      key: `reqresp-${r.id}`,
+      kind: 'requestResponse',
+      id: r.id,
+      raw: r,
+      myRole: 'customer',
+      status: r.status,
+      date: r.date,
+      arrivalTime: r.arrivalTime,
+      dateLabel: formatDateLabel(r.date),
+      otherName: r.driverName,
+      otherPhone: r.driverPhone,
+      otherCar: r.driverCar,
+      queues: r.pickupQueues,
+      note: r.note,
+    });
+  }
+
+  return list.filter((trip) => trip.status === 'confirmed' || trip.status === 'delivered');
+}
