@@ -6,6 +6,8 @@ import {
   arrayRemove,
   arrayUnion,
   collection,
+  deleteDoc,
+  deleteField,
   doc,
   getDoc,
   onSnapshot,
@@ -473,4 +475,77 @@ export async function cancelRequestResponse(response) {
 /** Водитель завершает поездку по чужому запросу — просто смена статуса. */
 export function completeRequestResponse(responseId) {
   return updateDoc(doc(db, 'requestResponses', responseId), { status: 'delivered' });
+}
+
+// --- Мои публикации: редактирование и снятие (S14) ----------------------
+// Раньше свой уже опубликованный запрос/предложение нельзя было ни найти
+// отдельно от общей доски, ни изменить, ни снять — только дождаться отклика
+// или молча оставить висеть. Правила Firestore это уже разрешали владельцу
+// (`rideOffers`/`requests` update/delete), не хватало только экранов.
+
+/** Подписка на мои открытые предложения — вкладка «Мои публикации». */
+export function subscribeMyRideOffers(uid, callback) {
+  const q = query(collection(db, 'rideOffers'), where('driverId', '==', uid), where('status', '==', 'open'));
+  return onSnapshot(q, (snap) => {
+    const offers = snap.docs
+      .map((item) => ({ id: item.id, ...item.data() }))
+      .sort((a, b) => (a.date + a.arrivalTime).localeCompare(b.date + b.arrivalTime));
+    callback(offers);
+  });
+}
+
+/** Подписка на мои открытые запросы, симметрично subscribeMyRideOffers. */
+export function subscribeMyRequests(uid, callback) {
+  const q = query(collection(db, 'requests'), where('customerId', '==', uid), where('status', '==', 'open'));
+  return onSnapshot(q, (snap) => {
+    const requests = snap.docs
+      .map((item) => ({ id: item.id, ...item.data() }))
+      .sort((a, b) => (a.date + a.arrivalTime).localeCompare(b.date + b.arrivalTime));
+    callback(requests);
+  });
+}
+
+/**
+ * Редактирование своего открытого предложения. Экран-вызывающий сам не даёт
+ * дойти сюда, если на предложение есть неотвеченные (`pending`) отклики —
+ * здесь только пересчёт `seatsFree`, чтобы не потерять уже подтверждённые
+ * места: если часть мест занята подтверждёнными откликами, новое
+ * `seatsTotal` не может стать меньше занятого.
+ */
+export function updateRideOffer(offer, { date, arrivalTime, seatsTotal, note }) {
+  const occupied = offer.seatsTotal - offer.seatsFree;
+  const seatsFree = seatsTotal - occupied;
+  if (seatsFree < 0) throw new Error('not-enough-seats');
+  return updateDoc(doc(db, 'rideOffers', offer.id), {
+    date,
+    arrivalTime,
+    seatsTotal,
+    seatsFree,
+    note: note || deleteField(),
+  });
+}
+
+/** Снятие своего открытого предложения с доски. */
+export function deleteRideOffer(offerId) {
+  return deleteDoc(doc(db, 'rideOffers', offerId));
+}
+
+/**
+ * Редактирование своего открытого запроса, симметрично updateRideOffer.
+ * Дети — пересобираем снимок из актуального профиля по выбранным id, как и
+ * при создании (см. createRequest).
+ */
+export function updateRequest(requestId, profile, { date, arrivalTime, childrenIds, note }) {
+  const children = profile.children.filter((child) => childrenIds.includes(child.id));
+  return updateDoc(doc(db, 'requests', requestId), {
+    date,
+    arrivalTime,
+    children,
+    note: note || deleteField(),
+  });
+}
+
+/** Снятие своего открытого запроса с доски. */
+export function deleteRequest(requestId) {
+  return deleteDoc(doc(db, 'requests', requestId));
 }

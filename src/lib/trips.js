@@ -116,3 +116,45 @@ export function buildTrips({ respCustomer, respDriver, reqRespDriver, reqRespCus
 
   return list.filter((trip) => trip.status === 'confirmed' || trip.status === 'delivered');
 }
+
+/**
+ * Мои открытые публикации (S14) — предложения и запросы, которые я
+ * опубликовал(а) и которые ещё висят на доске без подтверждённого отклика.
+ * В отличие от buildTrips, тут нет статуса confirmed/delivered — статус
+ * ролей здесь один, 'open', иначе документ не попал бы в подписку.
+ */
+export function buildMyListings({ offers, requests }) {
+  const list = [];
+
+  for (const o of offers) {
+    list.push({
+      key: `offer-${o.id}`,
+      kind: 'offer',
+      id: o.id,
+      date: o.date,
+      arrivalTime: o.arrivalTime,
+      dateLabel: formatDateLabel(o.date),
+      title: `${o.seatsFree} из ${o.seatsTotal} свободно`,
+      queues: o.pickupQueues,
+      note: o.note,
+      editHref: `/board/drivers/${o.id}/edit`,
+    });
+  }
+
+  for (const r of requests) {
+    list.push({
+      key: `request-${r.id}`,
+      kind: 'request',
+      id: r.id,
+      date: r.date,
+      arrivalTime: r.arrivalTime,
+      dateLabel: formatDateLabel(r.date),
+      title: childrenLabel(r.children),
+      queues: [r.homeQueue],
+      note: r.note,
+      editHref: `/board/requests/${r.id}/edit`,
+    });
+  }
+
+  return list.sort((a, b) => (a.date + a.arrivalTime).localeCompare(b.date + b.arrivalTime));
+}

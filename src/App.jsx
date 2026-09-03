@@ -7,6 +7,8 @@ import DriversBoard from './screens/DriversBoard.jsx';
 import RequestsBoard from './screens/RequestsBoard.jsx';
 import NewOffer from './screens/NewOffer.jsx';
 import NewRequest from './screens/NewRequest.jsx';
+import EditOffer from './screens/EditOffer.jsx';
+import EditRequest from './screens/EditRequest.jsx';
 import RespondSheet from './screens/RespondSheet.jsx';
 import OfferResponses from './screens/OfferResponses.jsx';
 import RequestRespondSheet from './screens/RequestRespondSheet.jsx';
@@ -76,10 +78,12 @@ export default function App() {
         <Route path="/board" element={<Navigate to="/board/drivers" replace />} />
         <Route path="/board/drivers" element={<DriversBoard />} />
         <Route path="/board/drivers/new" element={<NewOffer />} />
+        <Route path="/board/drivers/:offerId/edit" element={<EditOffer />} />
         <Route path="/board/drivers/:offerId/respond" element={<RespondSheet />} />
         <Route path="/board/drivers/:offerId/responses" element={<OfferResponses />} />
         <Route path="/board/requests" element={<RequestsBoard />} />
         <Route path="/board/requests/new" element={<NewRequest />} />
+        <Route path="/board/requests/:requestId/edit" element={<EditRequest />} />
         <Route path="/board/requests/:requestId/respond" element={<RequestRespondSheet />} />
         <Route path="/board/requests/:requestId/responses" element={<RequestResponses />} />
         <Route path="/trips" element={<MyTrips />} />

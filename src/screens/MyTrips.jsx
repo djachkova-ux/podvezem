@@ -7,13 +7,16 @@ import {
   completeResponse,
   getRequest,
   getRideOffer,
+  subscribeMyRequests,
+  subscribeMyRideOffers,
   subscribeRequestResponsesAsCustomer,
   subscribeRequestResponsesAsDriver,
   subscribeResponsesAsCustomer,
   subscribeResponsesAsDriver,
 } from '../lib/db.js';
-import { buildTrips } from '../lib/trips.js';
+import { buildMyListings, buildTrips } from '../lib/trips.js';
 import TripCard from '../components/TripCard.jsx';
+import MyListingCard from '../components/MyListingCard.jsx';
 
 export default function MyTrips() {
   const { user } = useAuth();
@@ -23,6 +26,8 @@ export default function MyTrips() {
   const [reqRespCustomer, setReqRespCustomer] = useState(null);
   const [offerCache, setOfferCache] = useState({});
   const [requestCache, setRequestCache] = useState({});
+  const [myOffers, setMyOffers] = useState(null);
+  const [myRequests, setMyRequests] = useState(null);
   const [tab, setTab] = useState('active');
   const [busyKey, setBusyKey] = useState(null);
   const [actionError, setActionError] = useState('');
@@ -30,6 +35,16 @@ export default function MyTrips() {
   useEffect(() => {
     if (!user) return undefined;
     return subscribeResponsesAsCustomer(user.uid, setRespCustomer);
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return undefined;
+    return subscribeMyRideOffers(user.uid, setMyOffers);
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return undefined;
+    return subscribeMyRequests(user.uid, setMyRequests);
   }, [user]);
 
   useEffect(() => {
@@ -96,6 +111,13 @@ export default function MyTrips() {
   const archive = trips
     .filter((trip) => trip.status === 'delivered')
     .sort((a, b) => (b.date + b.arrivalTime).localeCompare(a.date + a.arrivalTime));
+
+  const listingsLoading = myOffers === null || myRequests === null;
+  const listings = useMemo(() => {
+    if (listingsLoading) return [];
+    return buildMyListings({ offers: myOffers, requests: myRequests });
+  }, [listingsLoading, myOffers, myRequests]);
+
   const shown = tab === 'active' ? active : archive;
 
   async function handleCancel(trip) {
@@ -136,31 +158,56 @@ export default function MyTrips() {
         <button className="chip" type="button" aria-pressed={tab === 'archive'} onClick={() => setTab('archive')}>
           Архив · {archive.length}
         </button>
+        <button className="chip" type="button" aria-pressed={tab === 'mine'} onClick={() => setTab('mine')}>
+          Мои публикации · {listings.length}
+        </button>
       </div>
 
       {actionError && <p className="form-error">{actionError}</p>}
 
-      {loading && <p className="muted">Загрузка…</p>}
+      {tab === 'mine' ? (
+        <>
+          {listingsLoading && <p className="muted">Загрузка…</p>}
 
-      {!loading && shown.length === 0 && (
-        <p className="board-empty">
-          {tab === 'active' ? 'Активных поездок пока нет.' : 'Архив пуст.'}
-        </p>
-      )}
+          {!listingsLoading && listings.length === 0 && (
+            <p className="board-empty">Открытых публикаций пока нет.</p>
+          )}
 
-      {!loading && shown.length > 0 && (
-        <div className="route">
-          {shown.map((trip) => (
-            <article key={trip.key} className="ride is-open">
-              <TripCard
-                trip={trip}
-                busy={busyKey === trip.key}
-                onCancel={() => handleCancel(trip)}
-                onComplete={() => handleComplete(trip)}
-              />
-            </article>
-          ))}
-        </div>
+          {!listingsLoading && listings.length > 0 && (
+            <div className="route">
+              {listings.map((listing) => (
+                <article key={listing.key} className="ride is-open">
+                  <MyListingCard listing={listing} />
+                </article>
+              ))}
+            </div>
+          )}
+        </>
+      ) : (
+        <>
+          {loading && <p className="muted">Загрузка…</p>}
+
+          {!loading && shown.length === 0 && (
+            <p className="board-empty">
+              {tab === 'active' ? 'Активных поездок пока нет.' : 'Архив пуст.'}
+            </p>
+          )}
+
+          {!loading && shown.length > 0 && (
+            <div className="route">
+              {shown.map((trip) => (
+                <article key={trip.key} className="ride is-open">
+                  <TripCard
+                    trip={trip}
+                    busy={busyKey === trip.key}
+                    onCancel={() => handleCancel(trip)}
+                    onComplete={() => handleComplete(trip)}
+                  />
+                </article>
+              ))}
+            </div>
+          )}
+        </>
       )}
     </main>
   );
