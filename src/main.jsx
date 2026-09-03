@@ -6,6 +6,8 @@ import { AuthProvider } from './context/AuthContext.jsx';
 import './styles/tokens.css';
 import './styles/base.css';
 import './styles/forms.css';
+import './styles/auth-hero.css';
+import './styles/profile.css';
 import './styles/board.css';
 
 // Сервис-воркер регистрируем сразу при запуске, а не при включении

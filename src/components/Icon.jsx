@@ -11,9 +11,6 @@ const paths = {
       <path d="M5 16.5v1M19 16.5v1" />
     </>
   ),
-  // Силуэт иконки приложения (design/app-icon.svg) — знак в шапке повторяет
-  // то, что пользователь видит на домашнем экране телефона.
-  brand: <path d="M5 18h8.5a3 3 0 0 0 0-6h-4a3 3 0 0 1 0-6H19" />,
   board: (
     <>
       <rect x="3" y="4" width="18" height="14" rx="2.5" />
@@ -56,11 +53,33 @@ const paths = {
   ),
   plus: <path d="M12 5v14M5 12h14" />,
   close: <path d="M6 6l12 12M18 6L6 18" />,
+  check: <path d="M5 12.5 L10 17.5 L19 7" />,
+  chevronDown: <path d="M6 9 L12 15 L18 9" />,
 };
 
 const filledIcons = new Set(['seatFilled']);
 
+// Знак «Подвезём» (design/app-icon.svg) — единственная иконка с собственным
+// viewBox и вторым цветом (латунная точка прибытия, всегда --gold, а не
+// currentColor): при таком маленьком размере пунктирная разметка из
+// мастер-файла не читается, поэтому здесь упрощённый вариант — путь и точка.
+function BrandIcon(props) {
+  return (
+    <svg viewBox="0 0 64 64" fill="none" aria-hidden="true" focusable="false" {...props}>
+      <path
+        d="M17 51 L17 21 Q17 15 23 15 L41 15 Q47 15 47 21 L47 51"
+        stroke="currentColor"
+        strokeWidth="13"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="47" cy="51" r="6" fill="var(--gold)" />
+    </svg>
+  );
+}
+
 export default function Icon({ name, ...rest }) {
+  if (name === 'brand') return <BrandIcon {...rest} />;
   const shape = paths[name];
   if (!shape) return null;
   const filled = filledIcons.has(name);

@@ -17,11 +17,8 @@ export default function AppHead() {
         <span className="brand-mark">
           <Icon name="brand" width="20" height="20" />
         </span>
-        <span>
-          <span className="brand">Подвезём</span>
-          <br />
-          <span className="brand-date">{formatHeaderDate()}</span>
-        </span>
+        <span className="brand">Подвезём</span>
+        <span className="brand-date">{formatHeaderDate()}</span>
       </div>
 
       {onBoard && (

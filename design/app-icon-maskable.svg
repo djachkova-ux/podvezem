@@ -1,30 +1,29 @@
 <!--
-  «Подвезём» — иконка под маску (purpose "maskable" в манифесте, а также apple-touch-icon).
+  «Подвезём» — иконка под маску (S13, purpose "maskable" в манифесте, а также apple-touch-icon).
   Отличается от app-icon.svg только одним: фон полнокадровый, без скругления, —
   форму задаёт сама система (круг, сквиркл, капля), поэтому скруглять здесь нельзя.
 
-  Знак вписан в габарит 274×274 по центру: его диагональ 388 px укладывается
+  Знак вписан в область 384×384 по центру (отступ 64 с каждой стороны от канвы 512).
+  Диагональ его bounding box (с учётом толщины линии) — около 391 px, укладывается
   в safe zone Android (круг диаметром 80 % от стороны — 410 px), так что при любой
   маске дорога не обрежется. Если менять рисунок — проверить это условие заново.
 -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#2A6E55" />
-      <stop offset="1" stop-color="#123528" />
+    <linearGradient id="bg" x1="0.29" y1="0.05" x2="0.71" y2="0.95">
+      <stop offset="0%" stop-color="#2E7A5E" />
+      <stop offset="45%" stop-color="#1F5140" />
+      <stop offset="100%" stop-color="#0E2A1F" />
     </linearGradient>
   </defs>
 
   <rect width="512" height="512" fill="url(#bg)" />
 
-  <path
-    d="M150 362L300 362A53 53 0 0 0 300 256L212 256A53 53 0 0 1 212 150L362 150"
-    fill="none" stroke="#F6ECD9" stroke-width="62" stroke-linecap="round"
-  />
-  <path
-    d="M150 362L300 362A53 53 0 0 0 300 256L212 256A53 53 0 0 1 212 150L362 150"
-    fill="none" stroke="#B8912A" stroke-width="7" stroke-linecap="round" stroke-dasharray="18 24"
-  />
-  <circle cx="150" cy="362" r="17" fill="#B8912A" />
-  <circle cx="362" cy="150" r="17" fill="#B8912A" />
+  <svg x="64" y="64" width="384" height="384" viewBox="0 0 64 64">
+    <path d="M17 51 L17 21 Q17 15 23 15 L41 15 Q47 15 47 21 L47 51"
+          fill="none" stroke="#F2F7F2" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M17 51 L17 21 Q17 15 23 15 L41 15 Q47 15 47 21 L47 51"
+          fill="none" stroke="#B8912A" stroke-width="2" stroke-linecap="round" stroke-dasharray="5 6" />
+    <circle cx="47" cy="51" r="5.5" fill="#B8912A" />
+  </svg>
 </svg>
