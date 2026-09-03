@@ -3,6 +3,8 @@
 
 import {
   addDoc,
+  arrayRemove,
+  arrayUnion,
   collection,
   doc,
   getDoc,
@@ -35,6 +37,20 @@ export function subscribeUserProfile(uid, callback) {
   return onSnapshot(userRef(uid), (snap) => {
     callback(snap.exists() ? { id: snap.id, ...snap.data() } : null);
   });
+}
+
+/**
+ * Токены устройств для push (S10). Массив, а не одно поле — пользователь
+ * может включить уведомления на нескольких устройствах разом (телефон +
+ * компьютер). `arrayUnion`/`arrayRemove` сами дедуплицируют, отдельная
+ * транзакция не нужна.
+ */
+export function addNotificationToken(uid, token) {
+  return updateDoc(userRef(uid), { notificationTokens: arrayUnion(token) });
+}
+
+export function removeNotificationToken(uid, token) {
+  return updateDoc(userRef(uid), { notificationTokens: arrayRemove(token) });
 }
 
 /**

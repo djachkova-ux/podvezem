@@ -4,6 +4,7 @@ import { logout } from '../lib/auth.js';
 import { updateUserProfile } from '../lib/db.js';
 import { QUEUES } from '../lib/constants.js';
 import ChildrenList from '../components/ChildrenList.jsx';
+import NotificationsToggle from '../components/NotificationsToggle.jsx';
 
 const emptyCar = { plate: '', brand: '', color: '' };
 
@@ -207,6 +208,8 @@ export default function Profile() {
         </button>
         {saved && !saving && <p className="muted">Сохранено.</p>}
       </form>
+
+      <NotificationsToggle uid={user.uid} />
 
       <button className="btn btn-ghost" type="button" onClick={logout}>
         Выйти

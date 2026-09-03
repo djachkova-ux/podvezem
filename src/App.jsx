@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import AppHead from './components/AppHead.jsx';
 import TabBar from './components/TabBar.jsx';
@@ -15,6 +16,7 @@ import Login from './screens/Login.jsx';
 import Register from './screens/Register.jsx';
 import { firebaseReady } from './firebase.js';
 import { useAuth } from './context/AuthContext.jsx';
+import { listenForegroundMessages } from './lib/notifications.js';
 
 function ConfigNotice() {
   return (
@@ -31,6 +33,22 @@ export default function App() {
   const { user, authReady } = useAuth();
   const { pathname } = useLocation();
   const onAuthScreen = authRoutes.includes(pathname);
+
+  // Уведомления, пришедшие пока вкладка открыта и в фокусе (S10) — фоновые
+  // показывает сервис-воркер сам, foreground нужно показывать вручную.
+  useEffect(() => {
+    if (!user) return undefined;
+    let unsubscribe;
+    let cancelled = false;
+    listenForegroundMessages().then((fn) => {
+      if (cancelled) fn();
+      else unsubscribe = fn;
+    });
+    return () => {
+      cancelled = true;
+      unsubscribe?.();
+    };
+  }, [user]);
 
   // Без ключей Firebase auth/db отключены — пускаем всех без гейтинга,
   // как и раньше в S1.

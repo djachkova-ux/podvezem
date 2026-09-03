@@ -38,4 +38,9 @@ if (firebaseReady) {
   );
 }
 
+// VAPID-ключ для Web Push (S10) — отдельно от остальных: только он нужен
+// notifications.js, остальным модулям он не нужен и не должен утекать
+// в их импорты.
+export const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY;
+
 export { app, auth, db };
