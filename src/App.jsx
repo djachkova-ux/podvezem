@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import AppHead from './components/AppHead.jsx';
+import InstallHint from './components/InstallHint.jsx';
 import TabBar from './components/TabBar.jsx';
 import DriversBoard from './screens/DriversBoard.jsx';
 import RequestsBoard from './screens/RequestsBoard.jsx';
@@ -68,6 +69,7 @@ export default function App() {
     <div className="app">
       {!onAuthScreen && <AppHead />}
       {!firebaseReady && <ConfigNotice />}
+      {!onAuthScreen && <InstallHint />}
 
       <Routes>
         <Route path="/" element={<Navigate to="/board/drivers" replace />} />

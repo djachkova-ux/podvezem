@@ -172,6 +172,61 @@ h1, h2, h3, p { margin: 0; }
 .tap[aria-current="page"] { color: var(--navink); }
 .tap[aria-current="page"] svg { color: var(--gold); }
 
+/* --- подсказка «добавить на экран» (S11) --- */
+
+.install-hint {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 0 16px 12px;
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.install-hint-mark {
+  width: 34px; height: 34px; flex: none;
+  display: grid; place-items: center;
+  border-radius: var(--r-md);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.install-hint-body { flex: 1; min-width: 0; }
+
+.install-hint-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.install-hint-text {
+  margin: 3px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+
+/* .btn-primary из board.css растягивается на всю строку (flex: 1) — здесь
+   кнопка должна быть по размеру текста */
+.install-hint-action { flex: none; margin-top: 10px; padding: 9px 18px; }
+
+.install-hint-close {
+  flex: none;
+  display: grid; place-items: center;
+  width: 30px; height: 30px;
+  margin: -3px -4px 0 0;
+  border: 0;
+  border-radius: var(--r-sm);
+  background: none;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
 /* --- предупреждение о ненастроенном Firebase --- */
 
 .config-notice {

@@ -36,7 +36,16 @@ async function sendToUser(uid, tokens, { title, body, url }) {
 
   const message = { tokens, notification: { title, body } };
   if (process.env.APP_URL) {
-    message.webpush = { fcmOptions: { link: `${process.env.APP_URL}${url}` } };
+    message.webpush = {
+      fcmOptions: { link: `${process.env.APP_URL}${url}` },
+      // Иконки появились в S11. Оба поля требуют абсолютный URL, поэтому живут
+      // в той же ветке, что и link: без APP_URL уведомление уходит с иконкой
+      // браузера по умолчанию — деградация, не ошибка отправки.
+      notification: {
+        icon: `${process.env.APP_URL}/icons/icon-192.png`,
+        badge: `${process.env.APP_URL}/icons/badge-96.png`,
+      },
+    };
   }
 
   const response = await getMessaging().sendEachForMulticast(message);

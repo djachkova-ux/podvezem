@@ -31,7 +31,15 @@ async function sendToUser(uid, tokens, { title, body, url }) {
 
   const message = { tokens, notification: { title, body } };
   if (process.env.APP_URL) {
-    message.webpush = { fcmOptions: { link: `${process.env.APP_URL}${url}` } };
+    message.webpush = {
+      fcmOptions: { link: `${process.env.APP_URL}${url}` },
+      // Иконки появились в S11 — держим в одной ветке с link по той же причине:
+      // оба поля требуют абсолютный URL. Дублируется в notify/index.mjs.
+      notification: {
+        icon: `${process.env.APP_URL}/icons/icon-192.png`,
+        badge: `${process.env.APP_URL}/icons/badge-96.png`,
+      },
+    };
   }
 
   const response = await getMessaging().sendEachForMulticast(message);
