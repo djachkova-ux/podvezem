@@ -29,6 +29,7 @@ export default function TripCard({ trip, busy, onCancel, onComplete }) {
     otherName,
     otherPhone,
     otherCar,
+    otherStartStreet,
     queues,
     address,
     childrenLabel,
@@ -49,6 +50,8 @@ export default function TripCard({ trip, busy, onCancel, onComplete }) {
           </p>
         </div>
       </div>
+
+      {otherStartStreet && <p className="note">Выезжает с: {otherStartStreet}</p>}
 
       <div className="queues">
         {(queues || []).map((queue) => (

@@ -29,10 +29,7 @@ export default function RideCard({ offer, isOwn }) {
         <span className="avatar">{getInitials(offer.driverName)}</span>
         <div>
           <p className="name">{offer.driverName}</p>
-          <p className="car">
-            {offer.driverCar.brand} · {offer.driverCar.color} ·{' '}
-            <span className="plate">{offer.driverCar.plate}</span>
-          </p>
+          {offer.driverStartStreet && <p className="start-street">Выезжает с: {offer.driverStartStreet}</p>}
         </div>
       </div>
 

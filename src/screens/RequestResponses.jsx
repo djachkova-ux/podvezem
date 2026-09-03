@@ -32,10 +32,9 @@ function DriverResponseCard({ response, onConfirm, onReject, busy, disabled }) {
         <span className="avatar">{getInitials(response.driverName)}</span>
         <div>
           <p className="name">{response.driverName}</p>
-          <p className="car">
-            {response.driverCar.brand} · {response.driverCar.color} ·{' '}
-            <span className="plate">{response.driverCar.plate}</span>
-          </p>
+          {response.driverStartStreet && (
+            <p className="start-street">Выезжает с: {response.driverStartStreet}</p>
+          )}
         </div>
       </div>
 

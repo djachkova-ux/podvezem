@@ -46,6 +46,7 @@ export function buildTrips({ respCustomer, respDriver, reqRespDriver, reqRespCus
       otherName: offer?.driverName,
       otherPhone: offer?.driverPhone,
       otherCar: offer?.driverCar,
+      otherStartStreet: offer?.driverStartStreet,
       queues: offer?.pickupQueues,
       childrenLabel: childrenLabel(r.children),
       note: r.note,
@@ -107,6 +108,7 @@ export function buildTrips({ respCustomer, respDriver, reqRespDriver, reqRespCus
       otherName: r.driverName,
       otherPhone: r.driverPhone,
       otherCar: r.driverCar,
+      otherStartStreet: r.driverStartStreet,
       queues: r.pickupQueues,
       note: r.note,
     });

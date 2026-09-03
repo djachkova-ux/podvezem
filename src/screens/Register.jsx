@@ -17,6 +17,7 @@ export default function Register() {
   const [homeQueue, setHomeQueue] = useState(1);
   const [isDriver, setIsDriver] = useState(false);
   const [car, setCar] = useState(emptyCar);
+  const [startStreet, setStartStreet] = useState('');
   const [pickupQueues, setPickupQueues] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -58,6 +59,7 @@ export default function Register() {
         ...(isDriver
           ? {
               car: { plate: car.plate.trim(), brand: car.brand.trim(), color: car.color.trim() },
+              startStreet: startStreet.trim(),
               pickupQueues,
             }
           : {}),
@@ -155,6 +157,16 @@ export default function Register() {
                 id="reg-color"
                 value={car.color}
                 onChange={(event) => setCar({ ...car, color: event.target.value })}
+                required
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="reg-start-street">Улица отправления</label>
+              <input
+                id="reg-start-street"
+                value={startStreet}
+                onChange={(event) => setStartStreet(event.target.value)}
+                placeholder="Откуда выезжаете утром"
                 required
               />
             </div>
