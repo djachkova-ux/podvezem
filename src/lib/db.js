@@ -13,8 +13,10 @@ import {
   setDoc,
   updateDoc,
   where,
+  writeBatch,
 } from 'firebase/firestore';
 import { db } from '../firebase.js';
+import { getRepeatDates } from './dates.js';
 
 function userRef(uid) {
   return doc(db, 'users', uid);
@@ -80,6 +82,58 @@ export function createRideOffer(uid, profile, { date, arrivalTime, seatsTotal, n
   };
   if (note) payload.note = note;
   return addDoc(collection(db, 'rideOffers'), payload);
+}
+
+/**
+ * Повторяющееся предложение (S9, ТЗ 6.1): шаблон «дни недели + время» на
+ * месяц вперёд. Сам шаблон сохраняется в `offerTemplates` (для истории и
+ * будущего управления), а на каждую подходящую дату сразу создаётся
+ * самостоятельный документ `rideOffers` с меткой `templateId` — отмена или
+ * удаление одной даты (через уже существующее правило `delete` у владельца)
+ * никак не задевает остальные, они не связаны между собой ничем, кроме этой
+ * метки.
+ */
+export async function createRideOfferTemplate(
+  uid,
+  profile,
+  { weekdays, arrivalTime, seatsTotal, note },
+) {
+  const dates = getRepeatDates(weekdays);
+  if (dates.length === 0) throw new Error('no-dates-in-horizon');
+
+  const templateRef = doc(collection(db, 'offerTemplates'));
+  const batch = writeBatch(db);
+  batch.set(templateRef, {
+    driverId: uid,
+    weekdays,
+    arrivalTime,
+    seatsTotal,
+    note: note || null,
+    createdAt: serverTimestamp(),
+  });
+
+  const offerPayload = {
+    driverId: uid,
+    driverName: profile.name,
+    driverPhone: profile.phone,
+    driverCar: profile.car,
+    pickupQueues: profile.pickupQueues,
+    arrivalTime,
+    seatsTotal,
+    seatsFree: seatsTotal,
+    status: 'open',
+    templateId: templateRef.id,
+    createdAt: serverTimestamp(),
+  };
+  if (note) offerPayload.note = note;
+
+  dates.forEach((date) => {
+    const offerRef = doc(collection(db, 'rideOffers'));
+    batch.set(offerRef, { ...offerPayload, date });
+  });
+
+  await batch.commit();
+  return { templateId: templateRef.id, count: dates.length };
 }
 
 /**

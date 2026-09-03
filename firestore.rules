@@ -28,6 +28,15 @@ service cloud.firestore {
       allow delete: if request.auth != null && request.auth.uid == resource.data.driverId;
     }
 
+    // Шаблоны повторяющихся предложений (S9) — сама генерация создаёт
+    // независимые rideOffers (правило выше их уже покрывает), этот документ
+    // только хранит параметры шаблона для истории/будущего управления.
+    // Никому, кроме автора, не нужен и не виден.
+    match /offerTemplates/{templateId} {
+      allow read: if request.auth != null && request.auth.uid == resource.data.driverId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.driverId;
+    }
+
     // Запросы заказчиков на трансфер — читают все авторизованные,
     // создаёт и меняет только сам заказчик (владелец запроса).
     match /requests/{requestId} {

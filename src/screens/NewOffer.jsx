@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import { createRideOffer } from '../lib/db.js';
-import { toDateKey } from '../lib/dates.js';
+import { createRideOffer, createRideOfferTemplate } from '../lib/db.js';
+import { toDateKey, WEEKDAY_OPTIONS } from '../lib/dates.js';
 
 const seatOptions = [1, 2, 3, 4, 5, 6, 7, 8];
 
@@ -13,8 +13,16 @@ export default function NewOffer() {
   const [arrivalTime, setArrivalTime] = useState('08:00');
   const [seatsTotal, setSeatsTotal] = useState(4);
   const [note, setNote] = useState('');
+  const [repeat, setRepeat] = useState(false);
+  const [weekdays, setWeekdays] = useState([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+
+  function toggleWeekday(value) {
+    setWeekdays((prev) =>
+      prev.includes(value) ? prev.filter((day) => day !== value) : [...prev, value],
+    );
+  }
 
   if (!profile) {
     return (
@@ -48,15 +56,28 @@ export default function NewOffer() {
 
   async function handleSubmit(event) {
     event.preventDefault();
+    if (repeat && weekdays.length === 0) {
+      setError('Выберите хотя бы один день недели.');
+      return;
+    }
     setSaving(true);
     setError('');
     try {
-      await createRideOffer(user.uid, profile, {
-        date,
-        arrivalTime,
-        seatsTotal: Number(seatsTotal),
-        note: note.trim(),
-      });
+      if (repeat) {
+        await createRideOfferTemplate(user.uid, profile, {
+          weekdays,
+          arrivalTime,
+          seatsTotal: Number(seatsTotal),
+          note: note.trim(),
+        });
+      } else {
+        await createRideOffer(user.uid, profile, {
+          date,
+          arrivalTime,
+          seatsTotal: Number(seatsTotal),
+          note: note.trim(),
+        });
+      }
       navigate('/board/drivers');
     } catch {
       setError('Не удалось опубликовать. Попробуйте ещё раз.');
@@ -72,17 +93,44 @@ export default function NewOffer() {
       <h1 className="screen-title">Новое предложение</h1>
 
       <form className="form" onSubmit={handleSubmit}>
-        <div className="field">
-          <label htmlFor="offer-date">Дата</label>
+        <label className="checkbox-row">
           <input
-            id="offer-date"
-            type="date"
-            min={toDateKey()}
-            value={date}
-            onChange={(event) => setDate(event.target.value)}
-            required
+            type="checkbox"
+            checked={repeat}
+            onChange={(event) => setRepeat(event.target.checked)}
           />
-        </div>
+          Повторять по дням недели (на месяц вперёд)
+        </label>
+
+        {repeat ? (
+          <div className="field">
+            <label>Дни недели</label>
+            <div className="checkbox-group">
+              {WEEKDAY_OPTIONS.map((option) => (
+                <label className="checkbox-chip" key={option.value}>
+                  <input
+                    type="checkbox"
+                    checked={weekdays.includes(option.value)}
+                    onChange={() => toggleWeekday(option.value)}
+                  />
+                  {option.label}
+                </label>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="field">
+            <label htmlFor="offer-date">Дата</label>
+            <input
+              id="offer-date"
+              type="date"
+              min={toDateKey()}
+              value={date}
+              onChange={(event) => setDate(event.target.value)}
+              required
+            />
+          </div>
+        )}
 
         <div className="field">
           <label htmlFor="offer-time">Время прибытия в школу</label>
