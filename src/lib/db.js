@@ -207,3 +207,84 @@ export async function confirmResponse(response) {
 export function rejectResponse(responseId) {
   return updateDoc(doc(db, 'responses', responseId), { status: 'rejected' });
 }
+
+/** Подписка на один запрос (экраны отклика водителя и списка откликов, S7). */
+export function subscribeRequest(requestId, callback) {
+  return onSnapshot(doc(db, 'requests', requestId), (snap) => {
+    callback(snap.exists() ? { id: snap.id, ...snap.data() } : null);
+  });
+}
+
+/**
+ * Отклик водителя на запрос заказчика (S7), зеркально createResponse.
+ * `requestCustomerId` — денормализованный владелец запроса, нужен правилам
+ * Firestore и list-запросу заказчика (см. урок из S6 в db.js выше).
+ */
+export function createRequestResponse(uid, profile, request, { note }) {
+  const payload = {
+    requestId: request.id,
+    requestCustomerId: request.customerId,
+    driverId: uid,
+    driverName: profile.name,
+    driverPhone: profile.phone,
+    driverCar: profile.car,
+    pickupQueues: profile.pickupQueues,
+    date: request.date,
+    arrivalTime: request.arrivalTime,
+    status: 'pending',
+    createdAt: serverTimestamp(),
+  };
+  if (note) payload.note = note;
+  return addDoc(collection(db, 'requestResponses'), payload);
+}
+
+/**
+ * Подписка на отклики водителей к конкретному запросу — экран заказчика.
+ * Фильтр по `requestCustomerId` — по той же причине, что и в
+ * subscribeOfferResponses (правило read проверяет именно это поле).
+ */
+export function subscribeRequestResponses(requestId, customerUid, callback) {
+  const responsesQuery = query(
+    collection(db, 'requestResponses'),
+    where('requestId', '==', requestId),
+    where('requestCustomerId', '==', customerUid),
+  );
+  return onSnapshot(responsesQuery, (snap) => {
+    const responses = snap.docs
+      .map((item) => ({ id: item.id, ...item.data() }))
+      .sort((a, b) => (a.createdAt?.toMillis?.() ?? 0) - (b.createdAt?.toMillis?.() ?? 0));
+    callback(responses);
+  });
+}
+
+/**
+ * Подтверждение отклика водителя заказчиком. У запроса, в отличие от
+ * предложения, нет счётчика мест — подтверждение любого одного отклика
+ * сразу закрывает весь запрос. Транзакция нужна, чтобы два одновременных
+ * подтверждения разных откликов не закрыли запрос дважды.
+ */
+export async function confirmRequestResponse(response) {
+  const requestRef = doc(db, 'requests', response.requestId);
+  const responseRef = doc(db, 'requestResponses', response.id);
+
+  await runTransaction(db, async (tx) => {
+    const [requestSnap, responseSnap] = await Promise.all([tx.get(requestRef), tx.get(responseRef)]);
+    if (!requestSnap.exists() || !responseSnap.exists()) {
+      throw new Error('not-found');
+    }
+    if (requestSnap.data().status !== 'open') {
+      throw new Error('already-closed');
+    }
+    if (responseSnap.data().status !== 'pending') {
+      throw new Error('already-handled');
+    }
+
+    tx.update(requestRef, { status: 'closed' });
+    tx.update(responseRef, { status: 'confirmed' });
+  });
+}
+
+/** Отклонение отклика водителя заказчиком — без изменения запроса. */
+export function rejectRequestResponse(responseId) {
+  return updateDoc(doc(db, 'requestResponses', responseId), { status: 'rejected' });
+}

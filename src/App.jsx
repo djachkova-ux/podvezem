@@ -7,6 +7,8 @@ import NewOffer from './screens/NewOffer.jsx';
 import NewRequest from './screens/NewRequest.jsx';
 import RespondSheet from './screens/RespondSheet.jsx';
 import OfferResponses from './screens/OfferResponses.jsx';
+import RequestRespondSheet from './screens/RequestRespondSheet.jsx';
+import RequestResponses from './screens/RequestResponses.jsx';
 import MyTrips from './screens/MyTrips.jsx';
 import Profile from './screens/Profile.jsx';
 import Login from './screens/Login.jsx';
@@ -58,6 +60,8 @@ export default function App() {
         <Route path="/board/drivers/:offerId/responses" element={<OfferResponses />} />
         <Route path="/board/requests" element={<RequestsBoard />} />
         <Route path="/board/requests/new" element={<NewRequest />} />
+        <Route path="/board/requests/:requestId/respond" element={<RequestRespondSheet />} />
+        <Route path="/board/requests/:requestId/responses" element={<RequestResponses />} />
         <Route path="/trips" element={<MyTrips />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/login" element={<Login />} />

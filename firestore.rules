@@ -35,5 +35,15 @@ service cloud.firestore {
       allow create: if request.auth != null && request.auth.uid == request.resource.data.customerId;
       allow update: if request.auth != null && request.auth.uid == resource.data.offerDriverId;
     }
+
+    // Отклики водителя на запрос заказчика (S7), зеркально responses.
+    // Читают только участники (сам водитель или заказчик — владелец
+    // запроса); создаёт водитель; подтверждает/отклоняет только заказчик.
+    match /requestResponses/{responseId} {
+      allow read: if request.auth != null &&
+        (request.auth.uid == resource.data.driverId || request.auth.uid == resource.data.requestCustomerId);
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.driverId;
+      allow update: if request.auth != null && request.auth.uid == resource.data.requestCustomerId;
+    }
   }
 }

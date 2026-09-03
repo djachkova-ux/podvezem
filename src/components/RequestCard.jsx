@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import QueueTag from './QueueTag.jsx';
 import { getShift, SHIFTS } from '../lib/dates.js';
 
@@ -52,16 +53,13 @@ export default function RequestCard({ request, isOwn }) {
 
       <div className="actions">
         {isOwn ? (
-          <p className="own-note">Это ваш запрос</p>
+          <Link className="btn btn-primary" to={`/board/requests/${request.id}/responses`}>
+            Отклики
+          </Link>
         ) : (
-          <button
-            className="btn btn-primary"
-            type="button"
-            disabled
-            title="Отклики появятся в одной из следующих сессий"
-          >
+          <Link className="btn btn-primary" to={`/board/requests/${request.id}/respond`}>
             Откликнуться
-          </button>
+          </Link>
         )}
       </div>
     </div>
