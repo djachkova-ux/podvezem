@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { disableNetwork, enableNetwork } from 'firebase/firestore';
 import AppHead from './components/AppHead.jsx';
 import InstallHint from './components/InstallHint.jsx';
 import TabBar from './components/TabBar.jsx';
@@ -17,7 +18,7 @@ import MyTrips from './screens/MyTrips.jsx';
 import Profile from './screens/Profile.jsx';
 import Login from './screens/Login.jsx';
 import Register from './screens/Register.jsx';
-import { firebaseReady } from './firebase.js';
+import { db, firebaseReady } from './firebase.js';
 import { useAuth } from './context/AuthContext.jsx';
 import { listenForegroundMessages } from './lib/notifications.js';
 
@@ -52,6 +53,34 @@ export default function App() {
       unsubscribe?.();
     };
   }, [user]);
+
+  // Установленное на экран PWA-приложение, свёрнутое в трей/App Switcher,
+  // теряет сетевое соединение на уровне ОС (особенно жёстко на iOS) — вместе
+  // с ним обрывается и watch-стрим, на котором держатся все onSnapshot-
+  // подписки (доска, «Мои поездки»). Свой ретрай SDK не всегда просыпается
+  // сразу при возврате на передний план, поэтому пересобираем соединение
+  // явно: `visibilitychange` — обычное сворачивание/разворачивание,
+  // `pageshow` — восстановление страницы из bfcache на iOS Safari, где
+  // `visibilitychange` может не сработать вовсе.
+  useEffect(() => {
+    if (!db) return undefined;
+    let reconnecting = false;
+    const reconnect = () => {
+      if (document.visibilityState !== 'visible' || reconnecting) return;
+      reconnecting = true;
+      disableNetwork(db)
+        .then(() => enableNetwork(db))
+        .finally(() => {
+          reconnecting = false;
+        });
+    };
+    document.addEventListener('visibilitychange', reconnect);
+    window.addEventListener('pageshow', reconnect);
+    return () => {
+      document.removeEventListener('visibilitychange', reconnect);
+      window.removeEventListener('pageshow', reconnect);
+    };
+  }, []);
 
   // Без ключей Firebase auth/db отключены — пускаем всех без гейтинга,
   // как и раньше в S1.
