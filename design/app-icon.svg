@@ -1,0 +1,32 @@
+<!--
+  «Подвезём» — иконка приложения. Мастер-файл, из него нарезаны все PNG в public/.
+  Мотив: дорога-меандр с разметкой, латунные точки — «откуда» и «куда».
+  Палитра «Хвоя»: фон — градиент хвойного, полотно — тёплый крем, разметка и точки — латунь.
+
+  Этот вариант со скруглением 116 (22.7 %) — для обычных иконок (purpose "any"),
+  apple-touch-icon и favicon. Полнокадровый вариант под маску Android — app-icon-maskable.svg.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2A6E55" />
+      <stop offset="1" stop-color="#123528" />
+    </linearGradient>
+  </defs>
+
+  <rect width="512" height="512" rx="116" fill="url(#bg)" />
+
+  <!-- полотно дороги -->
+  <path
+    d="M150 362L300 362A53 53 0 0 0 300 256L212 256A53 53 0 0 1 212 150L362 150"
+    fill="none" stroke="#F6ECD9" stroke-width="62" stroke-linecap="round"
+  />
+  <!-- осевая разметка -->
+  <path
+    d="M150 362L300 362A53 53 0 0 0 300 256L212 256A53 53 0 0 1 212 150L362 150"
+    fill="none" stroke="#B8912A" stroke-width="7" stroke-linecap="round" stroke-dasharray="18 24"
+  />
+  <!-- точки маршрута -->
+  <circle cx="150" cy="362" r="17" fill="#B8912A" />
+  <circle cx="362" cy="150" r="17" fill="#B8912A" />
+</svg>

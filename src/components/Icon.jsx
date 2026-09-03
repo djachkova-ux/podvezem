@@ -11,6 +11,9 @@ const paths = {
       <path d="M5 16.5v1M19 16.5v1" />
     </>
   ),
+  // Силуэт иконки приложения (design/app-icon.svg) — знак в шапке повторяет
+  // то, что пользователь видит на домашнем экране телефона.
+  brand: <path d="M5 18h8.5a3 3 0 0 0 0-6h-4a3 3 0 0 1 0-6H19" />,
   board: (
     <>
       <rect x="3" y="4" width="18" height="14" rx="2.5" />
@@ -52,6 +55,7 @@ const paths = {
     </>
   ),
   plus: <path d="M12 5v14M5 12h14" />,
+  close: <path d="M6 6l12 12M18 6L6 18" />,
 };
 
 const filledIcons = new Set(['seatFilled']);

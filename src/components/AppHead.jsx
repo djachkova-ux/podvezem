@@ -15,7 +15,7 @@ export default function AppHead() {
     <header className="app-head">
       <div className="brand-row">
         <span className="brand-mark">
-          <Icon name="bus" width="20" height="20" />
+          <Icon name="brand" width="20" height="20" />
         </span>
         <span>
           <span className="brand">Подвезём</span>
