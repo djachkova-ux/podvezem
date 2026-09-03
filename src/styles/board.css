@@ -2,7 +2,16 @@
    Доски «Водители» / «Запросы»: полоса дат, фильтры, карточки поездок.
    ========================================================================== */
 
-.dates { flex: none; display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 4px; scrollbar-width: none; }
+.dates {
+  /* `safe center` — центрируем, только когда вся полоса дат помещается
+     без прокрутки (на широких Android-экранах иначе прилипала к левому
+     краю); если не помещается — откат на обычный старт слева, иначе
+     обычный `center` обрезает крайние даты и не даёт докрутить до них
+     (проверено: с ним scrollLeft=0 всё равно оставляет первую дату
+     обрезанной на ~20px, дальше вправо только хуже). */
+  flex: none; display: flex; justify-content: safe center; gap: 8px; overflow-x: auto;
+  padding: 2px 2px 4px; scrollbar-width: none;
+}
 .dates::-webkit-scrollbar { display: none; }
 .date {
   flex: none; width: 46px; padding: 8px 0 9px; border-radius: 14px; text-align: center;
