@@ -1,0 +1,15 @@
+{
+  "name": "notify",
+  "private": true,
+  "type": "module",
+  "description": "Подвезём — push-уведомления через polling Firestore (S10, замена Cloud Functions на время, пока Blaze недоступен, см. ХЭНДОФФ)",
+  "engines": {
+    "node": "20"
+  },
+  "scripts": {
+    "start": "node index.mjs"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.7.0"
+  }
+}

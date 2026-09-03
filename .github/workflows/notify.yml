@@ -1,0 +1,39 @@
+name: Push-уведомления (polling)
+
+# Замена Cloud Functions (S10) — тариф Blaze заблокирован Google (см.
+# ХЭНДОФФ). Раз в 10 минут опрашивает Firestore на новые/изменённые
+# документы и рассылает push через notify/index.mjs.
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch: {}
+
+concurrency:
+  group: notify-polling
+  cancel-in-progress: false
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Установить зависимости
+        working-directory: notify
+        run: npm ci
+
+      - name: Опросить Firestore и отправить push
+        working-directory: notify
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          echo "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/service-account.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/service-account.json"
+          node index.mjs

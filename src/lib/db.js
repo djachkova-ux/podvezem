@@ -270,13 +270,18 @@ export async function confirmResponse(response) {
 
     const seatsFree = offerData.seatsFree - count;
     tx.update(offerRef, seatsFree === 0 ? { seatsFree, status: 'closed' } : { seatsFree });
-    tx.update(responseRef, { status: 'confirmed' });
+    tx.update(responseRef, { status: 'confirmed', updatedAt: serverTimestamp() });
   });
 }
 
-/** Отклонение отклика водителем — без изменения мест, транзакция не нужна. */
+/**
+ * Отклонение отклика водителем — без изменения мест, транзакция не нужна.
+ * `updatedAt` (как и в confirm/cancel ниже) — курсор для polling-опроса
+ * push-уведомлений (S10, `notify/index.mjs`): без него нечем отличить
+ * «отклик только что сменил статус» от «отклик существует давно».
+ */
 export function rejectResponse(responseId) {
-  return updateDoc(doc(db, 'responses', responseId), { status: 'rejected' });
+  return updateDoc(doc(db, 'responses', responseId), { status: 'rejected', updatedAt: serverTimestamp() });
 }
 
 /** Подписка на один запрос (экраны отклика водителя и списка откликов, S7). */
@@ -351,13 +356,13 @@ export async function confirmRequestResponse(response) {
     }
 
     tx.update(requestRef, { status: 'closed' });
-    tx.update(responseRef, { status: 'confirmed' });
+    tx.update(responseRef, { status: 'confirmed', updatedAt: serverTimestamp() });
   });
 }
 
 /** Отклонение отклика водителя заказчиком — без изменения запроса. */
 export function rejectRequestResponse(responseId) {
-  return updateDoc(doc(db, 'requestResponses', responseId), { status: 'rejected' });
+  return updateDoc(doc(db, 'requestResponses', responseId), { status: 'rejected', updatedAt: serverTimestamp() });
 }
 
 // --- Мои поездки (S8) ---------------------------------------------------
@@ -431,7 +436,7 @@ export async function cancelResponse(response) {
     const offerData = offerSnap.data();
     const seatsFree = offerData.seatsFree + response.children.length;
     tx.update(offerRef, { seatsFree, status: 'open' });
-    tx.update(responseRef, { status: 'cancelled' });
+    tx.update(responseRef, { status: 'cancelled', updatedAt: serverTimestamp() });
   });
 }
 
@@ -458,7 +463,7 @@ export async function cancelRequestResponse(response) {
     }
 
     tx.update(requestRef, { status: 'open' });
-    tx.update(responseRef, { status: 'cancelled' });
+    tx.update(responseRef, { status: 'cancelled', updatedAt: serverTimestamp() });
   });
 }
 
