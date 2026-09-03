@@ -110,18 +110,26 @@
   margin-top: 6px;
 }
 
-.child-row { display: flex; align-items: flex-end; gap: 8px; }
-.child-row .field:first-child { flex: 1; }
+.child-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 8px 0;
+  border-radius: var(--r-md);
+  background: var(--surface-2);
+}
+.child-row .field:first-child { flex: 1; min-width: 0; }
 
 .child-remove {
   flex: none;
   width: 40px;
   height: 40px;
-  border-radius: var(--r-md);
-  border: 1px solid var(--line-strong);
-  background: var(--surface);
+  border: 0;
+  background: none;
   color: var(--warn);
-  font-size: 18px;
+  font-size: 20px;
   line-height: 1;
   cursor: pointer;
+  display: grid;
+  place-items: center;
 }
