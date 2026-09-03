@@ -23,12 +23,13 @@ function childrenLabel(children) {
 }
 
 /**
- * Собирает единый список поездок из четырёх ролей пользователя. `offerCache`
+ * Собирает единый список откликов из четырёх ролей пользователя. `offerCache`
  * и `requestCache` — разово подгруженные rideOffers/requests для ролей, у
  * которых на самом отклике нет данных второй стороны (см. хэндофф S8).
- * Возвращает только `confirmed`/`delivered` — остальные статусы экрану не нужны.
+ * Общая для buildTrips (S8) и buildResponses (S16) — они лишь по-разному
+ * фильтруют один и тот же список по статусу.
  */
-export function buildTrips({ respCustomer, respDriver, reqRespDriver, reqRespCustomer, offerCache, requestCache }) {
+function buildResponseList({ respCustomer, respDriver, reqRespDriver, reqRespCustomer, offerCache, requestCache }) {
   const list = [];
 
   for (const r of respCustomer) {
@@ -114,7 +115,30 @@ export function buildTrips({ respCustomer, respDriver, reqRespDriver, reqRespCus
     });
   }
 
-  return list.filter((trip) => trip.status === 'confirmed' || trip.status === 'delivered');
+  // Получатель отклика — та сторона, что решает подтвердить/отклонить: у
+  // предложения это водитель (myRole 'driver'), у запроса — заказчик
+  // (myRole 'customer'); другая сторона только отправила отклик и ждёт.
+  return list.map((trip) => ({
+    ...trip,
+    actionable: trip.kind === 'response' ? trip.myRole === 'driver' : trip.myRole === 'customer',
+  }));
+}
+
+/**
+ * «Мои поездки» (S8) — только подтверждённые/завершённые отклики.
+ */
+export function buildTrips(input) {
+  return buildResponseList(input).filter((trip) => trip.status === 'confirmed' || trip.status === 'delivered');
+}
+
+/**
+ * «Отклики» (S16) — отклики, ещё не подтверждённые (`pending`, с действием
+ * для получателя) или уже отклонённые (`rejected`, без действий — просто
+ * факт, видимый обеим сторонам). `confirmed`/`delivered` сюда не попадают —
+ * они уже показаны в «Поездках», дублировать незачем.
+ */
+export function buildResponses(input) {
+  return buildResponseList(input).filter((trip) => trip.status === 'pending' || trip.status === 'rejected');
 }
 
 /**

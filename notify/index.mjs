@@ -152,7 +152,7 @@ async function pollNewResponses(cursor) {
     await sendToUid(response.offerDriverId, {
       title: 'Новый отклик на вашу поездку',
       body: `${response.customerName} · ${response.arrivalTime}`,
-      url: `/board/drivers/${response.offerId}/responses`,
+      url: '/responses',
     });
   }
   return snap.docs.at(-1).data().createdAt;
@@ -179,7 +179,7 @@ async function pollResponseStatusChanges(cursor) {
       await sendToUid(after.customerId, {
         title: 'Отклик отклонён',
         body: `Поездку на ${after.arrivalTime} водитель не подтвердил`,
-        url: '/board/drivers',
+        url: '/responses',
       });
     } else if (after.status === 'cancelled') {
       await sendToUid(after.offerDriverId, {
@@ -202,7 +202,7 @@ async function pollNewRequestResponses(cursor) {
     await sendToUid(response.requestCustomerId, {
       title: 'Новый отклик на ваш запрос',
       body: `${response.driverName} · ${response.arrivalTime}`,
-      url: `/board/requests/${response.requestId}/responses`,
+      url: '/responses',
     });
   }
   return snap.docs.at(-1).data().createdAt;
@@ -229,7 +229,7 @@ async function pollRequestResponseStatusChanges(cursor) {
       await sendToUid(after.driverId, {
         title: 'Отклик отклонён',
         body: `Запрос на ${after.arrivalTime} закрыт без вас`,
-        url: '/board/requests',
+        url: '/responses',
       });
     } else if (after.status === 'cancelled') {
       await sendToUid(after.driverId, {

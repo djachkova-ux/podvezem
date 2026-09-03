@@ -12,7 +12,7 @@ exports.onRequestResponseCreated = onDocumentCreated('requestResponses/{response
   await sendToUid(response.requestCustomerId, {
     title: 'Новый отклик на ваш запрос',
     body: `${response.driverName} · ${response.arrivalTime}`,
-    url: `/board/requests/${response.requestId}/responses`,
+    url: '/responses',
   });
 });
 
@@ -37,7 +37,7 @@ exports.onRequestResponseUpdated = onDocumentUpdated('requestResponses/{response
     await sendToUid(after.driverId, {
       title: 'Отклик отклонён',
       body: `Запрос на ${after.arrivalTime} закрыт без вас`,
-      url: '/board/requests',
+      url: '/responses',
     });
   } else if (after.status === 'cancelled') {
     await sendToUid(after.driverId, {

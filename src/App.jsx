@@ -15,6 +15,7 @@ import OfferResponses from './screens/OfferResponses.jsx';
 import RequestRespondSheet from './screens/RequestRespondSheet.jsx';
 import RequestResponses from './screens/RequestResponses.jsx';
 import MyTrips from './screens/MyTrips.jsx';
+import Responses from './screens/Responses.jsx';
 import Profile from './screens/Profile.jsx';
 import Login from './screens/Login.jsx';
 import Register from './screens/Register.jsx';
@@ -116,6 +117,7 @@ export default function App() {
         <Route path="/board/requests/:requestId/respond" element={<RequestRespondSheet />} />
         <Route path="/board/requests/:requestId/responses" element={<RequestResponses />} />
         <Route path="/trips" element={<MyTrips />} />
+        <Route path="/responses" element={<Responses />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />

@@ -11,7 +11,7 @@ exports.onResponseCreated = onDocumentCreated('responses/{responseId}', async (e
   await sendToUid(response.offerDriverId, {
     title: 'Новый отклик на вашу поездку',
     body: `${response.customerName} · ${response.arrivalTime}`,
-    url: `/board/drivers/${response.offerId}/responses`,
+    url: '/responses',
   });
 });
 
@@ -35,7 +35,7 @@ exports.onResponseUpdated = onDocumentUpdated('responses/{responseId}', async (e
     await sendToUid(after.customerId, {
       title: 'Отклик отклонён',
       body: `Поездку на ${after.arrivalTime} водитель не подтвердил`,
-      url: '/board/drivers',
+      url: '/responses',
     });
   } else if (after.status === 'cancelled') {
     await sendToUid(after.offerDriverId, {

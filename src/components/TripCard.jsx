@@ -14,14 +14,18 @@ function getInitials(name) {
 const statusLabels = {
   delivered: 'Поездка завершена',
   cancelled: 'Отменена',
+  rejected: 'Отклонён',
 };
 
 /**
- * Карточка «моей поездки» — общая для всех четырёх ролей (заказчик/водитель
+ * Карточка отклика — общая для «Поездок» (S8, confirmed/delivered) и
+ * «Откликов» (S16, pending/rejected), всех четырёх ролей (заказчик/водитель
  * × предложение/запрос). Что показывать и какая кнопка активна, решает сам
- * `trip`, собранный в MyTrips.jsx (см. нормализацию там).
+ * `trip`, собранный в trips.js. `actionable` — я ли получатель этого
+ * отклика (значит, вправе подтвердить/отклонить); отправитель на pending
+ * видит только «Ждём решения», действий у него нет.
  */
-export default function TripCard({ trip, busy, onCancel, onComplete }) {
+export default function TripCard({ trip, busy, onCancel, onComplete, onConfirm, onReject }) {
   const {
     status,
     dateLabel,
@@ -35,6 +39,7 @@ export default function TripCard({ trip, busy, onCancel, onComplete }) {
     childrenLabel,
     note,
     myRole,
+    actionable,
   } = trip;
 
   return (
@@ -66,6 +71,17 @@ export default function TripCard({ trip, busy, onCancel, onComplete }) {
       {note && <p className="note">{note}</p>}
 
       <div className="actions">
+        {status === 'pending' && actionable && (
+          <>
+            <button className="btn btn-primary" type="button" disabled={busy} onClick={onConfirm}>
+              Подтвердить
+            </button>
+            <button className="btn btn-ghost" type="button" disabled={busy} onClick={onReject}>
+              Отклонить
+            </button>
+          </>
+        )}
+        {status === 'pending' && !actionable && <p className="own-note">Ждём решения</p>}
         {status === 'confirmed' && myRole === 'customer' && (
           <button className="btn btn-ghost" type="button" disabled={busy} onClick={onCancel}>
             Отменить поездку
@@ -76,7 +92,7 @@ export default function TripCard({ trip, busy, onCancel, onComplete }) {
             Закончить поездку
           </button>
         )}
-        {status !== 'confirmed' && <p className="own-note">{statusLabels[status]}</p>}
+        {status !== 'confirmed' && status !== 'pending' && <p className="own-note">{statusLabels[status]}</p>}
         {otherPhone && (
           <a
             className="btn btn-icon"

@@ -7,6 +7,7 @@ import Icon from './Icon.jsx';
 const tabs = [
   { to: '/board/drivers', match: '/board', icon: 'board', label: 'Доска' },
   { to: '/trips', match: '/trips', icon: 'route', label: 'Поездки' },
+  { to: '/responses', match: '/responses', icon: 'inbox', label: 'Отклики' },
   { to: '/profile', match: '/profile', icon: 'user', label: 'Профиль' },
 ];
 

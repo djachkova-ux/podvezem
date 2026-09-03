@@ -117,6 +117,8 @@ export default function MyTrips() {
     if (listingsLoading) return [];
     return buildMyListings({ offers: myOffers, requests: myRequests });
   }, [listingsLoading, myOffers, myRequests]);
+  const myOfferListings = listings.filter((listing) => listing.kind === 'offer');
+  const myRequestListings = listings.filter((listing) => listing.kind === 'request');
 
   const shown = tab === 'active' ? active : archive;
 
@@ -174,13 +176,37 @@ export default function MyTrips() {
           )}
 
           {!listingsLoading && listings.length > 0 && (
-            <div className="route">
-              {listings.map((listing) => (
-                <article key={listing.key} className="ride is-open">
-                  <MyListingCard listing={listing} />
-                </article>
-              ))}
-            </div>
+            <>
+              <section className="response-group">
+                <h2 className="group-title">Мои трансферы</h2>
+                {myOfferListings.length === 0 ? (
+                  <p className="board-empty">Открытых поездок пока нет.</p>
+                ) : (
+                  <div className="route">
+                    {myOfferListings.map((listing) => (
+                      <article key={listing.key} className="ride is-open">
+                        <MyListingCard listing={listing} />
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </section>
+
+              <section className="response-group">
+                <h2 className="group-title">Мои запросы</h2>
+                {myRequestListings.length === 0 ? (
+                  <p className="board-empty">Открытых запросов пока нет.</p>
+                ) : (
+                  <div className="route">
+                    {myRequestListings.map((listing) => (
+                      <article key={listing.key} className="ride is-open">
+                        <MyListingCard listing={listing} />
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </section>
+            </>
           )}
         </>
       ) : (
