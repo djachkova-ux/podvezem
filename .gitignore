@@ -16,6 +16,9 @@ firestore-debug.log
 ui-debug.log
 serviceAccountKey.json
 
+# выгрузка профилей (export:users) — содержит персональные данные
+export/
+
 # системное
 .DS_Store
 Thumbs.db

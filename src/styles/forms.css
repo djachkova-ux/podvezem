@@ -52,6 +52,7 @@
 }
 
 .checkbox-row input { width: 18px; height: 18px; accent-color: var(--accent); }
+.checkbox-row input:disabled { cursor: not-allowed; }
 
 .checkbox-group { display: flex; gap: 8px; flex-wrap: wrap; }
 
@@ -133,3 +134,84 @@
   display: grid;
   place-items: center;
 }
+
+/* ---- модальное окно (соглашение при регистрации) ---- */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 17, 0.55);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 12px;
+  z-index: 100;
+}
+
+@media (min-width: 560px) {
+  .modal-overlay { align-items: center; }
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 440px;
+  max-height: min(86vh, 720px);
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modal-header {
+  padding: 18px 20px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.modal-body {
+  padding: 14px 20px;
+  overflow-y: auto;
+  color: var(--ink-2);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.agreement-text h3 {
+  margin: 16px 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.agreement-text h3:first-child { margin-top: 0; }
+
+.agreement-text p { margin: 0 0 10px; }
+
+.agreement-text ul { margin: 0 0 10px; padding-left: 20px; }
+.agreement-text li { margin-bottom: 6px; }
+
+.modal-footer {
+  padding: 14px 20px calc(env(safe-area-inset-bottom) + 14px);
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.checkbox-row-disabled { color: var(--ink-3); }
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.modal-actions .btn { flex: 1; }

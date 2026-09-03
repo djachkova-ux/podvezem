@@ -8,7 +8,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "seed:ride-offers": "node scripts/seed-ride-offers.mjs"
+    "seed:ride-offers": "node scripts/seed-ride-offers.mjs",
+    "export:users": "node scripts/export-users.mjs"
   },
   "dependencies": {
     "firebase": "^12.18.0",
@@ -18,6 +19,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.1.1",
+    "firebase-admin": "^14.3.0",
     "vite": "^8.2.2"
   }
 }

@@ -1,10 +1,20 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { deleteUser } from 'firebase/auth';
+import { serverTimestamp } from 'firebase/firestore';
 import { authErrorMessage, registerWithPhone } from '../lib/auth.js';
 import { createUserProfile } from '../lib/db.js';
 import { isValidPhone } from '../lib/phone.js';
-import { QUEUES } from '../lib/constants.js';
+import { AGREEMENT_VERSION, PRIVACY_VERSION, QUEUES } from '../lib/constants.js';
+import ConsentModal from '../components/ConsentModal.jsx';
+import TermsAgreementText from '../components/TermsAgreementText.jsx';
+import PrivacyConsentText from '../components/PrivacyConsentText.jsx';
+
+// Регистрация требует двух раздельных согласий (юридически разные вещи):
+// сперва — пользовательское соглашение об ответственности за поездки,
+// затем — согласие на обработку персональных данных. 'terms' | 'privacy' | null.
+const STEP_TERMS = 'terms';
+const STEP_PRIVACY = 'privacy';
 
 const emptyCar = { plate: '', brand: '', color: '' };
 
@@ -21,6 +31,9 @@ export default function Register() {
   const [pickupQueues, setPickupQueues] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [step, setStep] = useState(null);
+  const [termsChecked, setTermsChecked] = useState(false);
+  const [privacyChecked, setPrivacyChecked] = useState(false);
 
   function togglePickupQueue(queue) {
     setPickupQueues((prev) =>
@@ -28,12 +41,29 @@ export default function Register() {
     );
   }
 
-  async function handleSubmit(event) {
+  function handleFormSubmit(event) {
     event.preventDefault();
     if (!isValidPhone(phone)) {
       setError('Введите номер телефона полностью.');
       return;
     }
+    setError('');
+    setStep(STEP_TERMS);
+  }
+
+  function handleStepCancel() {
+    setStep(null);
+    setTermsChecked(false);
+    setPrivacyChecked(false);
+  }
+
+  function handleTermsConfirm() {
+    if (!termsChecked) return;
+    setStep(STEP_PRIVACY);
+  }
+
+  async function handlePrivacyConfirm() {
+    if (!privacyChecked) return;
 
     setSubmitting(true);
     setError('');
@@ -42,6 +72,7 @@ export default function Register() {
     try {
       user = await registerWithPhone(phone, password);
     } catch (err) {
+      setStep(null);
       setError(authErrorMessage(err));
       setSubmitting(false);
       return;
@@ -56,6 +87,12 @@ export default function Register() {
         homeQueue: Number(homeQueue),
         children: [],
         isDriver,
+        agreementAccepted: true,
+        agreementVersion: AGREEMENT_VERSION,
+        agreementAcceptedAt: serverTimestamp(),
+        privacyAccepted: true,
+        privacyVersion: PRIVACY_VERSION,
+        privacyAcceptedAt: serverTimestamp(),
         ...(isDriver
           ? {
               car: { plate: car.plate.trim(), brand: car.brand.trim(), color: car.color.trim() },
@@ -67,6 +104,7 @@ export default function Register() {
       navigate('/board/drivers', { replace: true });
     } catch {
       await deleteUser(user).catch(() => {});
+      setStep(null);
       setError('Не удалось создать профиль. Попробуйте ещё раз.');
       setSubmitting(false);
     }
@@ -77,7 +115,7 @@ export default function Register() {
       <h1 className="screen-title">Регистрация</h1>
       <p className="muted">Телефон работает как логин, SMS не нужен.</p>
 
-      <form className="form" onSubmit={handleSubmit}>
+      <form className="form" onSubmit={handleFormSubmit}>
         <div className="field">
           <label htmlFor="reg-name">Имя</label>
           <input id="reg-name" value={name} onChange={(event) => setName(event.target.value)} required />
@@ -197,6 +235,36 @@ export default function Register() {
       <p className="auth-switch">
         Уже есть аккаунт? <Link to="/login">Войти</Link>
       </p>
+
+      {step === STEP_TERMS && (
+        <ConsentModal
+          title="Пользовательское соглашение"
+          checkboxLabel="Я прочитал(а) и подтверждаю своё согласие с условиями использования"
+          confirmLabel="Согласен, продолжить"
+          checked={termsChecked}
+          onCheckedChange={setTermsChecked}
+          onConfirm={handleTermsConfirm}
+          onCancel={handleStepCancel}
+          confirming={false}
+        >
+          <TermsAgreementText />
+        </ConsentModal>
+      )}
+
+      {step === STEP_PRIVACY && (
+        <ConsentModal
+          title="Согласие на обработку персональных данных"
+          checkboxLabel="Я прочитал(а) и даю согласие на обработку персональных данных"
+          confirmLabel="Согласен и регистрируюсь"
+          checked={privacyChecked}
+          onCheckedChange={setPrivacyChecked}
+          onConfirm={handlePrivacyConfirm}
+          onCancel={handleStepCancel}
+          confirming={submitting}
+        >
+          <PrivacyConsentText />
+        </ConsentModal>
+      )}
     </main>
   );
 }
