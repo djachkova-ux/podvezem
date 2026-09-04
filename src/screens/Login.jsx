@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { authErrorMessage, loginWithPhone } from '../lib/auth.js';
-import { isValidPhone } from '../lib/phone.js';
+import { formatPhoneInput, isValidPhone } from '../lib/phone.js';
 
 /**
  * Знак «Подвезём» на тёмном герое — светлый бейдж с тёмным путём и золотой
@@ -102,7 +102,7 @@ export default function Login() {
               type="tel"
               autoComplete="tel"
               value={phone}
-              onChange={(event) => setPhone(event.target.value)}
+              onChange={(event) => setPhone(formatPhoneInput(event.target.value))}
               placeholder="+7 900 123-45-67"
               required
             />

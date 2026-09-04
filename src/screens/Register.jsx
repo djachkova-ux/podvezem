@@ -4,7 +4,7 @@ import { deleteUser } from 'firebase/auth';
 import { serverTimestamp } from 'firebase/firestore';
 import { authErrorMessage, registerWithPhone } from '../lib/auth.js';
 import { createUserProfile } from '../lib/db.js';
-import { isValidPhone } from '../lib/phone.js';
+import { formatPhoneInput, isValidPhone } from '../lib/phone.js';
 import { AGREEMENT_VERSION, PRIVACY_VERSION, QUEUES } from '../lib/constants.js';
 import ConsentModal from '../components/ConsentModal.jsx';
 import TermsAgreementText from '../components/TermsAgreementText.jsx';
@@ -128,7 +128,7 @@ export default function Register() {
             type="tel"
             autoComplete="tel"
             value={phone}
-            onChange={(event) => setPhone(event.target.value)}
+            onChange={(event) => setPhone(formatPhoneInput(event.target.value))}
             placeholder="+7 900 123-45-67"
             required
           />
